@@ -57,7 +57,7 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/verify", {
+      const response = await fetch("http://localhost:5000/api/auth/login-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ export default function Register() {
       }
 
       localStorage.setItem("token", result.token);
-      navigate("/home");
+      navigate("/layout");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -376,14 +376,46 @@ export default function Register() {
             </Box>
           )}
 
+          {/* ===== دکمه انتقال به صفحه لاگین ===== */}
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "rgba(255, 255, 255, 0.3)",
+                display: "inline-block",
+                ml: 1,
+              }}
+            >
+              حساب کاربری دارید؟
+            </Typography>
+            <Button
+              variant="text"
+              onClick={() => navigate("/login")}
+              sx={{
+                color: "rgba(255, 255, 255, 0.6)",
+                fontSize: "0.95rem",
+                textTransform: "none",
+                fontWeight: 600,
+                "&:hover": {
+                  color: "#ffffff",
+                  backgroundColor: "transparent",
+                  transform: "scale(1.02)",
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
+              وارد شوید
+            </Button>
+          </Box>
+
           <Typography
             textAlign="center"
             variant="caption"
             sx={{
               display: "block",
-              mt: 3,
-              color: "rgba(255, 255, 255, 0.2)",
-              fontSize: "0.75rem",
+              mt: 2,
+              color: "rgba(255, 255, 255, 0.15)",
+              fontSize: "0.7rem",
             }}
           >
             {step === 1
