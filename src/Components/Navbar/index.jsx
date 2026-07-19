@@ -1,6 +1,4 @@
 // components/common/Navbar.jsx
-'use client';
-
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -16,27 +14,22 @@ import {
   Container,
   Tooltip,
   Badge,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
   useMediaQuery,
   useTheme,
   Fade,
   Stack,
   Chip,
-  Paper,
   alpha,
+  TextField,
+  InputAdornment,
+  Divider,
+  ListItemIcon,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Home,
-  Article,
   Category,
-  Comment,
-  Dashboard,
+  ShoppingCart,
   Person,
   Logout,
   Login,
@@ -47,34 +40,31 @@ import {
   Notifications,
   Settings,
   AdminPanelSettings,
-  KeyboardArrowDown,
-  Close,
-  AutoAwesome,
-  Stars,
+  Favorite,
+  Storefront,
+  Dashboard,
+  Receipt,
+  Discount,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { ColorModeContext } from '../../App';
-import Users from '../../Pages/Users';
 
-// استایل‌های سفارشی
-const StyledAppBar = styled(AppBar)(({ theme, scrolled }) => ({
+const StyledAppBar = styled(AppBar, {
+  shouldForwardProp: (prop) => prop !== 'scrolled',
+})(({ theme, scrolled }) => ({
   position: 'sticky',
   elevation: scrolled ? 4 : 0,
-  backgroundColor: scrolled 
-    ? theme.palette.mode === 'dark' 
-      ? 'rgba(18, 18, 18, 0.92)' 
-      : 'rgba(255, 255, 255, 0.92)'
-    : theme.palette.mode === 'dark'
-      ? 'rgba(18, 18, 18, 0.98)'
-      : 'rgba(255, 255, 255, 0.98)',
+  backgroundColor: '#0a0a0a',
   backdropFilter: 'blur(20px)',
   borderBottom: scrolled 
     ? 'none' 
-    : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(102, 126, 234, 0.08)'}`,
+    : '1px solid rgba(255,255,255,0.05)',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   boxShadow: scrolled 
-    ? `0 4px 30px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0, 0, 0, 0.08)'}` 
+    ? '0 4px 30px rgba(0,0,0,0.5)' 
     : 'none',
+  direction: 'rtl',
+  color: '#ffffff',
 }));
 
 const LogoText = styled(Typography)(({ theme }) => ({
@@ -84,24 +74,17 @@ const LogoText = styled(Typography)(({ theme }) => ({
   alignItems: 'center',
   fontSize: '1.5rem',
   letterSpacing: '-0.5px',
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-  backgroundSize: '200% 200%',
-  backgroundClip: 'text',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-  animation: 'gradientShift 4s ease-in-out infinite',
-  '@keyframes gradientShift': {
-    '0%, 100%': { backgroundPosition: '0% 50%' },
-    '50%': { backgroundPosition: '100% 50%' },
-  },
+  color: '#ffffff',
   '&:hover': {
     transform: 'scale(1.02)',
     transition: 'transform 0.3s ease',
   },
 }));
 
-const NavButton = styled(Button)(({ theme, active }) => ({
-  color: active ? '#667eea' : theme.palette.text.secondary,
+const NavButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})(({ theme, active }) => ({
+  color: active ? '#667eea' : 'rgba(255,255,255,0.7)',
   fontWeight: active ? 600 : 500,
   position: 'relative',
   borderRadius: '12px',
@@ -122,45 +105,49 @@ const NavButton = styled(Button)(({ theme, active }) => ({
     transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   '&:hover': {
-    color: '#667eea',
-    backgroundColor: alpha('#667eea', theme.palette.mode === 'dark' ? 0.15 : 0.06),
+    color: '#ffffff',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     transform: 'translateY(-1px)',
     '&::before': {
       transform: 'translateX(-50%) scaleX(1)',
     },
   },
   '& .MuiButton-startIcon': {
-    marginRight: 8,
+    marginLeft: 8,
+    marginRight: 0,
   },
 }));
 
-const AdminButton = styled(Button)(({ theme, active }) => ({
+const AdminButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})(({ theme, active }) => ({
   color: '#ff9800',
   fontWeight: active ? 600 : 500,
-  backgroundColor: active ? alpha('#ff9800', 0.12) : 'transparent',
+  backgroundColor: active ? 'rgba(255,152,0,0.15)' : 'transparent',
   borderRadius: '12px',
   padding: '8px 20px',
   textTransform: 'none',
   fontSize: '0.95rem',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    backgroundColor: alpha('#ff9800', 0.15),
+    backgroundColor: 'rgba(255,152,0,0.2)',
     transform: 'translateY(-1px)',
     boxShadow: '0 4px 15px rgba(255, 152, 0, 0.2)',
   },
   '& .MuiButton-startIcon': {
-    marginRight: 8,
+    marginLeft: 8,
+    marginRight: 0,
   },
 }));
 
 const ActionIconButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.text.secondary,
+  color: 'rgba(255,255,255,0.6)',
   padding: 8,
   borderRadius: '12px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    color: '#667eea',
-    backgroundColor: alpha('#667eea', theme.palette.mode === 'dark' ? 0.15 : 0.08),
+    color: '#ffffff',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     transform: 'scale(1.05)',
   },
 }));
@@ -184,13 +171,20 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
   margin: '4px 8px',
   padding: '10px 16px',
   transition: 'all 0.2s ease',
+  color: 'rgba(255,255,255,0.8)',
   '&:hover': {
-    backgroundColor: alpha('#667eea', theme.palette.mode === 'dark' ? 0.15 : 0.06),
-    transform: 'translateX(4px)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    transform: 'translateX(-4px)',
+  },
+  '& .MuiListItemIcon-root': {
+    minWidth: 40,
+    marginLeft: 8,
+    marginRight: 0,
+    color: 'rgba(255,255,255,0.6)',
   },
 }));
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick }) {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
@@ -199,11 +193,13 @@ export default function Navbar() {
   
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElNotifications, setAnchorElNotifications] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [admin, setAdmin] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const cartCount = 3;
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -227,7 +223,6 @@ export default function Navbar() {
 
   const handleNavigate = (path) => {
     navigate(path);
-    setDrawerOpen(false);
     handleCloseUserMenu();
   };
 
@@ -265,206 +260,196 @@ export default function Navbar() {
     return location.pathname === path;
   };
 
-  const menuItems = [
-    { text: 'کاربران', icon:<Category />, path: '/users' },
-    { text: 'دسته‌بندی‌ها', icon: <Category />, path: '/categories' },
-    { text: 'پست‌ها', icon: <Article />, path: '/posts' },
-    { text: 'خانه', icon: <Home />, path: '/home' },
-  ];
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${searchQuery}`);
+      setSearchQuery("");
+    }
+  };
 
-  const adminMenuItems = [
-    { text: 'داشبورد', icon: <Dashboard />, path: '/admin' },
-    { text: 'مدیریت پست‌ها', icon: <Article />, path: '/admin/posts' },
-    { text: 'مدیریت دسته‌بندی‌ها', icon: <Category />, path: '/admin/categories' },
-    { text: 'مدیریت کامنت‌ها', icon: <Comment />, path: '/admin/comments' },
-    { text: 'مدیریت کاربران', icon: <Person />, path: '/admin/users' },
+  const menuItems = [
+    { text: 'خانه', icon: <Home />, path: '/' },
+    { text: 'محصولات', icon: <Category />, path: '/products' },
+    { text: 'دسته‌بندی‌ها', icon: <Category />, path: '/categories' },
+    { text: 'فروش ویژه', icon: <Discount />, path: '/sales' },
   ];
 
   const userMenuItems = [
     { text: 'پروفایل', icon: <Person />, path: '/profile' },
+    { text: 'سفارشات من', icon: <Receipt />, path: '/orders' },
+    { text: 'علاقه‌مندی‌ها', icon: <Favorite />, path: '/wishlist' },
     { text: 'تنظیمات', icon: <Settings />, path: '/settings' },
   ];
 
   const isDark = theme.palette.mode === 'dark';
 
-  const drawerList = () => (
-    <Box sx={{ width: 300 }} role="presentation">
-      <Box sx={{ 
-        p: 3, 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-      }}>
-        <Box>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            وبلاگ من
-          </Typography>
-          {loggedIn && user && (
-            <Typography variant="body2" sx={{ mt: 0.5, opacity: 0.85 }}>
-              خوش آمدی، {user.username}
-            </Typography>
-          )}
-        </Box>
-        <IconButton onClick={() => setDrawerOpen(false)} sx={{ color: 'white' }}>
-          <Close />
-        </IconButton>
-      </Box>
-      <Divider />
-      <List sx={{ px: 1, py: 1 }}>
-        {menuItems.map((item) => (
-          <ListItem 
-            key={item.text}
-            onClick={() => handleNavigate(item.path)}
-            sx={{ 
-              cursor: 'pointer',
-              borderRadius: 2,
-              mb: 0.5,
-              bgcolor: isActivePath(item.path) ? alpha('#667eea', 0.08) : 'transparent',
-              '&:hover': { 
-                bgcolor: alpha('#667eea', 0.06),
-                transform: 'translateX(4px)',
-                transition: 'all 0.2s ease',
-              },
-              '& .MuiListItemIcon-root': {
-                color: isActivePath(item.path) ? '#667eea' : 'inherit',
-                minWidth: 40,
-              },
-            }}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText 
-              primary={item.text} 
-              sx={{
-                '& .MuiTypography-root': {
-                  fontWeight: isActivePath(item.path) ? 600 : 400,
-                  color: isActivePath(item.path) ? '#667eea' : 'inherit',
-                }
-              }}
-            />
-          </ListItem>
-        ))}
-      </List>
-      
-      {admin && (
-        <>
-          <Divider />
-          <Box sx={{ px: 2, py: 1.5 }}>
-            <Chip 
-              label="بخش مدیریت" 
-              size="medium"
-              icon={<AdminPanelSettings />}
-              sx={{ 
-                bgcolor: alpha('#ff9800', 0.1),
-                color: '#ff9800',
-                fontWeight: 600,
-                width: '100%',
-                justifyContent: 'flex-start',
-                borderRadius: 2,
-                '& .MuiChip-icon': { color: '#ff9800' }
-              }}
-            />
-          </Box>
-          <List sx={{ px: 1 }}>
-            {adminMenuItems.map((item) => (
-              <ListItem 
-                key={item.text}
-                onClick={() => handleNavigate(item.path)}
-                sx={{ 
-                  pl: 4, 
-                  cursor: 'pointer',
-                  borderRadius: 2,
-                  mb: 0.5,
-                  bgcolor: isActivePath(item.path) ? alpha('#667eea', 0.08) : 'transparent',
-                  '&:hover': { 
-                    bgcolor: alpha('#667eea', 0.06),
-                    transform: 'translateX(4px)',
-                    transition: 'all 0.2s ease',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ 
-                  color: isActivePath(item.path) ? '#667eea' : 'inherit',
-                  minWidth: 40,
-                }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText 
-                  primary={item.text}
-                  sx={{
-                    '& .MuiTypography-root': {
-                      fontWeight: isActivePath(item.path) ? 600 : 400,
-                      color: isActivePath(item.path) ? '#667eea' : 'inherit',
-                    }
-                  }}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </>
-      )}
-
-      {loggedIn && (
-        <>
-          <Divider />
-          <List sx={{ px: 1 }}>
-            {userMenuItems.map((item) => (
-              <ListItem 
-                key={item.text}
-                onClick={() => handleNavigate(item.path)}
-                sx={{ 
-                  cursor: 'pointer',
-                  borderRadius: 2,
-                  mb: 0.5,
-                  '&:hover': { 
-                    bgcolor: alpha('#667eea', 0.06),
-                    transform: 'translateX(4px)',
-                    transition: 'all 0.2s ease',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-            <ListItem 
-              onClick={handleLogout} 
-              sx={{ 
-                cursor: 'pointer',
-                borderRadius: 2,
-                '&:hover': { 
-                  bgcolor: alpha('#f44336', 0.08),
-                  transform: 'translateX(4px)',
-                  transition: 'all 0.2s ease',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 40 }}><Logout sx={{ color: '#f44336' }} /></ListItemIcon>
-              <ListItemText primary="خروج" sx={{ color: '#f44336' }} />
-            </ListItem>
-          </List>
-        </>
-      )}
-    </Box>
-  );
-
   return (
     <StyledAppBar position="sticky" scrolled={scrolled}>
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ height: 72, display: 'flex', alignItems: 'center' , gap: 1}}>
+        <Toolbar disableGutters sx={{ height: 72, display: 'flex', alignItems: 'center', gap: 1, direction: 'rtl' }}>
           
-          {/* ===== بخش چپ: دکمه همبرگری (فقط موبایل) ===== */}
-          <Box sx={{ display: 'flex', alignItems: 'center', minWidth: 'fit-content' }}>
+          {/* دکمه همبرگری */}
+          <ActionIconButton onClick={onMenuClick}>
+            <MenuIcon />
+          </ActionIconButton>
+          
+          <LogoText onClick={() => handleNavigate('/')}>
+            <Storefront sx={{ 
+              mr: 1, 
+              color: '#667eea',
+              fontSize: isMobile ? '1.3rem' : '1.8rem',
+            }} />
+            فروشگاه من
+          </LogoText>
+
+          {!isMobile && (
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 0.5, 
+              flex: 1, 
+              justifyContent: 'center',
+              direction: 'rtl',
+            }}>
+              {menuItems.map((item) => (
+                <NavButton
+                  key={item.text}
+                  onClick={() => handleNavigate(item.path)}
+                  startIcon={item.icon}
+                  active={isActivePath(item.path) ? 1 : 0}
+                >
+                  {item.text}
+                </NavButton>
+              ))}
+              
+              <Box 
+                component="form" 
+                onSubmit={handleSearch}
+                sx={{ 
+                  mx: 2,
+                  minWidth: 200,
+                  maxWidth: 300,
+                  flex: 1,
+                }}
+              >
+                <TextField
+                  size="small"
+                  placeholder="جستجوی محصول..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  fullWidth
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      '& fieldset': {
+                        borderColor: 'rgba(255,255,255,0.1)',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: 'rgba(255,255,255,0.2)',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#667eea',
+                      },
+                      '& input': {
+                        color: '#ffffff',
+                      },
+                    },
+                    '& input': {
+                      padding: '10px 14px',
+                      fontSize: '0.9rem',
+                      textAlign: 'right',
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search sx={{ color: 'rgba(255,255,255,0.4)', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
+              {admin && (
+                <AdminButton
+                  onClick={() => handleNavigate('/admin')}
+                  startIcon={<AdminPanelSettings />}
+                  active={isActivePath('/admin') ? 1 : 0}
+                >
+                  مدیریت
+                </AdminButton>
+              )}
+            </Box>
+          )}
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {isMobile && (
-              <ActionIconButton onClick={() => setDrawerOpen(true)}>
-                <MenuIcon />
+              <ActionIconButton onClick={() => navigate('/search')}>
+                <Search />
               </ActionIconButton>
             )}
-          </Box>
-          {loggedIn ? (
+            
+            <ActionIconButton onClick={() => navigate('/wishlist')}>
+              <Badge 
+                badgeContent={5} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '0.6rem',
+                    minWidth: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    backgroundColor: '#f44336',
+                  }
+                }}
+              >
+                <Favorite />
+              </Badge>
+            </ActionIconButton>
+
+            <ActionIconButton onClick={handleOpenNotifications}>
+              <Badge 
+                badgeContent={3} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '0.6rem',
+                    minWidth: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #f44336, #e91e63)',
+                  }
+                }}
+              >
+                <Notifications />
+              </Badge>
+            </ActionIconButton>
+
+            <ActionIconButton onClick={() => navigate('/cart')}>
+              <Badge 
+                badgeContent={cartCount} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: '0.6rem',
+                    minWidth: 18,
+                    height: 18,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #ff9800, #f44336)',
+                  }
+                }}
+              >
+                <ShoppingCart />
+              </Badge>
+            </ActionIconButton>
+
+            <ActionIconButton onClick={toggleDarkMode}>
+              {isDark ? <LightMode /> : <DarkMode />}
+            </ActionIconButton>
+
+            {loggedIn ? (
               <>
                 <Tooltip title="حساب کاربری" arrow>
                   <StyledAvatar onClick={handleOpenUserMenu}>
@@ -475,16 +460,19 @@ export default function Navbar() {
                   anchorEl={anchorElUser}
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                   TransitionComponent={Fade}
                   PaperProps={{
                     sx: {
                       mt: 1.5,
                       borderRadius: 3,
-                      minWidth: 240,
-                      boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
+                      minWidth: 260,
+                      boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
                       overflow: 'hidden',
+                      direction: 'rtl',
+                      bgcolor: '#0a0a0a',
+                      border: '1px solid rgba(255,255,255,0.05)',
                     }
                   }}
                 >
@@ -497,7 +485,7 @@ export default function Navbar() {
                       {user?.username}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.85 }}>
-                      {user?.role === 'admin' ? 'مدیر سیستم' : 'کاربر'}
+                      {user?.role === 'admin' ? 'مدیر فروشگاه' : 'کاربر'}
                     </Typography>
                     {user?.role === 'admin' && (
                       <Chip 
@@ -513,10 +501,18 @@ export default function Navbar() {
                       />
                     )}
                   </Box>
-                  <Divider />
+                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
                   <StyledMenuItem onClick={() => handleNavigate('/profile')}>
                     <ListItemIcon><Person fontSize="small" /></ListItemIcon>
                     پروفایل
+                  </StyledMenuItem>
+                  <StyledMenuItem onClick={() => handleNavigate('/orders')}>
+                    <ListItemIcon><Receipt fontSize="small" /></ListItemIcon>
+                    سفارشات من
+                  </StyledMenuItem>
+                  <StyledMenuItem onClick={() => handleNavigate('/wishlist')}>
+                    <ListItemIcon><Favorite fontSize="small" /></ListItemIcon>
+                    علاقه‌مندی‌ها
                   </StyledMenuItem>
                   <StyledMenuItem onClick={() => handleNavigate('/settings')}>
                     <ListItemIcon><Settings fontSize="small" /></ListItemIcon>
@@ -525,10 +521,10 @@ export default function Navbar() {
                   {admin && (
                     <StyledMenuItem onClick={() => handleNavigate('/admin')}>
                       <ListItemIcon><Dashboard fontSize="small" /></ListItemIcon>
-                      داشبورد
+                      پنل مدیریت
                     </StyledMenuItem>
                   )}
-                  <Divider />
+                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
                   <StyledMenuItem onClick={handleLogout} sx={{ color: '#f44336' }}>
                     <ListItemIcon><Logout fontSize="small" sx={{ color: '#f44336' }} /></ListItemIcon>
                     خروج
@@ -536,7 +532,7 @@ export default function Navbar() {
                 </Menu>
               </>
             ) : (
-              <Stack direction="row" spacing={1} sx={{ ml: 1 }}>
+              <Stack direction="row" spacing={1} sx={{ mr: 1 }}>
                 <Button 
                   onClick={() => handleNavigate('/login')} 
                   variant="outlined" 
@@ -544,14 +540,14 @@ export default function Navbar() {
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',
-                    borderColor: '#667eea',
-                    color: '#667eea',
+                    borderColor: 'rgba(255,255,255,0.2)',
+                    color: 'rgba(255,255,255,0.8)',
                     px: 2.5,
                     py: 0.8,
                     fontWeight: 600,
                     '&:hover': {
-                      borderColor: '#764ba2',
-                      bgcolor: alpha('#667eea', 0.05),
+                      borderColor: '#667eea',
+                      bgcolor: 'rgba(255,255,255,0.05)',
                       transform: 'translateY(-1px)',
                       boxShadow: '0 4px 15px rgba(102, 126, 234, 0.2)',
                     },
@@ -583,149 +579,9 @@ export default function Navbar() {
                 </Button>
               </Stack>
             )}
-            <ActionIconButton onClick={handleOpenNotifications}>
-              <Badge 
-                badgeContent={3} 
-                color="error"
-                sx={{
-                  '& .MuiBadge-badge': {
-                    fontSize: '0.6rem',
-                    minWidth: 18,
-                    height: 18,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #f44336, #e91e63)',
-                  }
-                }}
-              >
-                <Notifications />
-              </Badge>
-            </ActionIconButton>
-            
-            <ActionIconButton onClick={toggleDarkMode}>
-              {isDark ? <LightMode /> : <DarkMode />}
-            </ActionIconButton>
-            
-            <ActionIconButton onClick={() => handleNavigate('/search')}>
-              <Search />
-            </ActionIconButton>
-
-            {/*  */}
-
-
-          {/* ===== بخش وسط: منو (فقط دسکتاپ) ===== */}
-          {!isMobile && (
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: 0.5, 
-              flex: 1, 
-              justifyContent: 'center' 
-            }}>
-              {admin && (
-                <AdminButton
-                  onClick={() => handleNavigate('/admin')}
-                  startIcon={<AdminPanelSettings />}
-                  active={isActivePath('/admin') ? 1 : 0}
-                >
-                  مدیریت
-                </AdminButton>
-              )}
-              {menuItems.map((item) => (
-                <NavButton
-                  key={item.text}
-                  onClick={() => handleNavigate(item.path)}
-                  startIcon={item.icon}
-                  active={isActivePath(item.path) ? 1 : 0}
-                >
-                  {item.text}
-                </NavButton>
-              ))}
-            </Box>
-          )}
-
-          {/* ===== بخش راست: لوگو + آیکون‌ها + پروفایل ===== */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 'auto' }}>
-            
-
-            
-
-            
-            <LogoText onClick={() => handleNavigate('/')}>
-              <Article sx={{ 
-                ml: 1, 
-                color: '#667eea', 
-                WebkitTextFillColor: '#667eea',
-                fontSize: isMobile ? '1.3rem' : '1.8rem',
-              }} />
-              وبلاگ من
-              {!isMobile && (
-                <AutoAwesome sx={{ 
-                  ml: 0.5, 
-                  fontSize: '0.9rem',
-                  color: '#764ba2',
-                  WebkitTextFillColor: '#764ba2',
-                  opacity: 0.6,
-                }} />
-              )}
-            </LogoText>
           </Box>
         </Toolbar>
       </Container>
-
-      {/* ===== دراور - از سمت چپ باز میشه ===== */}
-      <Drawer 
-        anchor="left"
-        open={drawerOpen} 
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            borderTopRightRadius: 24,
-            borderBottomRightRadius: 24,
-            boxShadow: '4px 0 30px rgba(0,0,0,0.08)',
-          }
-        }}
-      >
-        {drawerList()}
-      </Drawer>
-
-      <Menu
-        anchorEl={anchorElNotifications}
-        open={Boolean(anchorElNotifications)}
-        onClose={handleCloseNotifications}
-        TransitionComponent={Fade}
-        PaperProps={{
-          sx: {
-            mt: 1.5,
-            borderRadius: 3,
-            minWidth: 300,
-            boxShadow: '0 8px 40px rgba(0,0,0,0.12)',
-            overflow: 'hidden',
-          }
-        }}
-      >
-        <Box sx={{ 
-          px: 2.5, 
-          py: 2, 
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}>
-          <Typography variant="subtitle1" fontWeight={700}>اعلان‌ها</Typography>
-          <Chip 
-            label="۳ جدید" 
-            size="small"
-            color="primary"
-            sx={{ borderRadius: 1, fontWeight: 600 }}
-          />
-        </Box>
-        <Box sx={{ p: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 3 }}>
-            هیچ اعلان جدیدی وجود ندارد
-          </Typography>
-        </Box>
-      </Menu>
     </StyledAppBar>
   );
 }
