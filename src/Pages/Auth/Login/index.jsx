@@ -6,6 +6,7 @@ import {
   Paper,
   Typography,
   Alert,
+  Divider,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -49,6 +50,7 @@ export default function Login() {
 
       console.log(result);
       localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
       navigate("/home");
     } catch (err) {
       setError(err.message);
@@ -193,7 +195,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder=""
+                placeholder="رمز عبور خود را وارد کنید"
                 required
                 style={{
                   width: "100%",
@@ -268,7 +270,14 @@ export default function Login() {
                 },
               }}
             >
-              {loading ? "در حال ورود..." : "ورود"}
+              {loading ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CircularProgress size={24} sx={{ color: "#0a0a0a" }} />
+                  در حال ورود...
+                </Box>
+              ) : (
+                "ورود"
+              )}
             </Button>
 
             <Box
@@ -308,6 +317,44 @@ export default function Login() {
               >
                 ثبت‌نام
               </Typography>
+            </Box>
+
+            {/* ===== دکمه ورود با کد یکبارمصرف ===== */}
+            <Box sx={{ mt: 2 }}>
+              <Divider sx={{ mb: 2 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.2)",
+                    px: 2,
+                  }}
+                >
+                  یا
+                </Typography>
+              </Divider>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => navigate("/loginOtp")}
+                sx={{
+                  height: 48,
+                  borderRadius: 3,
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  color: "rgba(255, 255, 255, 0.6)",
+                  borderColor: "rgba(255, 255, 255, 0.15)",
+                  textTransform: "none",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    borderColor: "rgba(255, 255, 255, 0.4)",
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                ورود با کد یکبارمصرف
+              </Button>
             </Box>
           </Box>
         </Paper>
