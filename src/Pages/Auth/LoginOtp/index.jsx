@@ -39,7 +39,7 @@ export default function LoginOtp() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/login-otp",
+        "http://localhost:5000/api/auth",
         {
           method: "POST",
           headers: {
@@ -78,7 +78,7 @@ export default function LoginOtp() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/verify",
+        "http://localhost:5000/api/auth/login-otp",
         {
           method: "POST",
           headers: {
