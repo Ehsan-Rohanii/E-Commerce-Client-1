@@ -4,13 +4,14 @@ import Register from "../Pages/Auth/Register";
 import Login from "../Pages/Auth/Login";
 import Home from "../Pages/Home";
 import LoginOtp from "../Pages/Auth/LoginOtp";
+import Slider from "../Components/Slider";
 
 
 
 
 const router = createBrowserRouter([
     {
-        path:"/",
+        path:"/register",
         element:<Register/>
     },
     {
@@ -22,12 +23,12 @@ const router = createBrowserRouter([
         element:<LoginOtp/>
     },
     {
-        path:"/layout",
+        path:"/",
         element: <Layout/>,
         children: [
             {
                 index:true ,
-                element:<Home/>
+                element:<Home/>,
             },
         ],
     },
