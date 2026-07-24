@@ -1,364 +1,725 @@
-// components/common/SideBar.jsx
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// SideBar.jsx
+import React, { useState, useEffect, useContext } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
-  Box,
   Drawer,
+  Box,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Divider,
   Typography,
   Avatar,
-  Chip,
   Stack,
+  Chip,
   Button,
-  useMediaQuery,
   useTheme,
-} from '@mui/material';
+  useMediaQuery,
+  Collapse,
+  Badge,
+  IconButton,
+} from '@mui/material'
 import {
   Home,
   Category,
   ShoppingCart,
   Person,
   Logout,
+  Login,
+  AppRegistration,
+  DarkMode,
+  LightMode,
+  Settings,
+  AdminPanelSettings,
+  Favorite,
+  Storefront,
   Dashboard,
   Receipt,
   Discount,
-  Favorite,
-  Storefront,
+  ExpandLess,
+  ExpandMore,
   Close,
-  AdminPanelSettings,
-  Settings,
+  Inventory,
   LocalShipping,
   Payment,
-  Help as HelpIcon,
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+  Help,
+  ContactSupport,
+  NewReleases,
+  TrendingUp,
+} from '@mui/icons-material'
+import { styled } from '@mui/material/styles'
+import { ColorModeContext } from '../../App'
+
+// ارتفاع Navbar در سایزهای مختلف
+const NAVBAR_HEIGHT = {
+  xs: 64,
+  sm: 68,
+  md: 72,
+}
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: 280,
+  flexShrink: 0,
   '& .MuiDrawer-paper': {
     width: 280,
-    backgroundColor: '#0a0a0a',
-    borderLeft: '1px solid rgba(255,255,255,0.05)',
-    boxShadow: '-4px 0 30px rgba(0,0,0,0.5)',
-    overflowX: 'hidden',
-    right: 0,
-    left: 'auto',
+    backgroundColor: theme.palette.mode === 'dark' ? '#0a0a0a' : '#ffffff',
+    borderRight: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+    borderLeft: 'none',
+    boxShadow: theme.palette.mode === 'dark' 
+      ? '4px 0 30px rgba(0,0,0,0.5)'
+      : '4px 0 30px rgba(0,0,0,0.05)',
+    paddingTop: 0,
+    direction: 'rtl',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    overflow: 'hidden',
+    // برای دسکتاپ ثابت می‌شود و در سمت راست قرار می‌گیرد
+    [theme.breakpoints.up('md')]: {
+      position: 'fixed',
+      top: NAVBAR_HEIGHT.md,
+      height: `calc(100vh - ${NAVBAR_HEIGHT.md}px)`,
+      right: 0,
+      left: 'auto',
+    },
   },
-}));
+}))
 
-const LogoBox = styled(Box)(({ theme }) => ({
-  padding: '20px 20px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  gap: '12px',
-  borderBottom: '1px solid rgba(255,255,255,0.05)',
-  cursor: 'pointer',
+const ProfileHeader = styled(Box)(({ theme }) => ({
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  padding: '24px 20px 32px 20px',
+  color: 'white',
+  position: 'relative',
+  overflow: 'hidden',
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: -50,
+    right: -50,
+    width: 150,
+    height: 150,
+    borderRadius: '50%',
+    background: 'rgba(255,255,255,0.05)',
+  },
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    bottom: -80,
+    left: -80,
+    width: 200,
+    height: 200,
+    borderRadius: '50%',
+    background: 'rgba(255,255,255,0.03)',
+  },
+}))
+
+const CloseButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  padding: 8,
+  color: 'rgba(255,255,255,0.7)',
+  backgroundColor: 'rgba(255,255,255,0.1)',
+  backdropFilter: 'blur(10px)',
+  borderRadius: '50%',
+  zIndex: 10,
   '&:hover': {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    transform: 'rotate(90deg)',
+    transition: 'transform 0.3s ease',
   },
-}));
+}))
 
-const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: 56,
+  height: 56,
+  border: '3px solid rgba(255,255,255,0.3)',
+  backgroundColor: 'rgba(255,255,255,0.2)',
+  backdropFilter: 'blur(10px)',
+  boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    transform: 'scale(1.05)',
+    borderColor: 'rgba(255,255,255,0.6)',
+  },
+}))
+
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: '12px',
-  margin: '2px 8px',
+  margin: '4px 12px',
   padding: '10px 16px',
-  cursor: 'pointer',
-  transition: 'all 0.2s ease',
-  color: active ? '#ffffff' : 'rgba(255,255,255,0.6)',
-  backgroundColor: active ? 'rgba(102,126,234,0.15)' : 'transparent',
+  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+  color: theme.palette.mode === 'dark' 
+    ? 'rgba(255,255,255,0.7)' 
+    : 'rgba(0,0,0,0.6)',
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(102, 126, 234, 0.15)' 
+      : 'rgba(102, 126, 234, 0.08)',
+    color: '#667eea',
+    '& .MuiListItemIcon-root': {
+      color: '#667eea',
+    },
+    '&:hover': {
+      backgroundColor: theme.palette.mode === 'dark' 
+        ? 'rgba(102, 126, 234, 0.25)' 
+        : 'rgba(102, 126, 234, 0.12)',
+    },
+  },
   '&:hover': {
-    backgroundColor: active ? 'rgba(102,126,234,0.2)' : 'rgba(255,255,255,0.05)',
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.05)' 
+      : 'rgba(0,0,0,0.04)',
     transform: 'translateX(-4px)',
+    color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
   },
   '& .MuiListItemIcon-root': {
-    color: active ? '#667eea' : 'rgba(255,255,255,0.4)',
     minWidth: 40,
-    marginRight: 8,
-    marginLeft: 0,
+    color: 'inherit',
+    transition: 'all 0.2s ease',
   },
-  '& .MuiListItemText-root': {
-    textAlign: 'right',
-  },
-  '& .MuiListItemText-primary': {
-    fontWeight: active ? 600 : 400,
-    fontSize: '0.9rem',
-    textAlign: 'right',
-  },
-}));
+}))
 
-const SectionTitle = styled(Typography)(({ theme }) => ({
-  padding: '16px 20px 8px 20px',
-  color: 'rgba(255,255,255,0.3)',
-  fontSize: '0.7rem',
-  fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '1px',
-  textAlign: 'right',
-}));
+const StyledListItem = styled(ListItem)(({ theme }) => ({
+  padding: 0,
+}))
 
-const StyledChip = styled(Chip)(({ theme }) => ({
-  backgroundColor: 'rgba(255,152,0,0.15)',
-  color: '#ff9800',
-  fontSize: '0.6rem',
-  height: 20,
-  fontWeight: 600,
-}));
+const FooterBox = styled(Box)(({ theme }) => ({
+  padding: '16px 20px',
+  borderTop: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+  marginTop: 'auto',
+}))
+
+const ThemeToggleButton = styled(Button)(({ theme }) => ({
+  borderRadius: '12px',
+  padding: '10px 16px',
+  justifyContent: 'flex-start',
+  color: theme.palette.mode === 'dark' 
+    ? 'rgba(255,255,255,0.7)' 
+    : 'rgba(0,0,0,0.6)',
+  textTransform: 'none',
+  width: '100%',
+  '&:hover': {
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.05)' 
+      : 'rgba(0,0,0,0.04)',
+  },
+  '& .MuiButton-startIcon': {
+    marginLeft: 12,
+    marginRight: 0,
+  },
+}))
 
 export default function SideBar({ open, onClose }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate()
+  const location = useLocation()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const colorMode = useContext(ColorModeContext)
   
-  const [user, setUser] = useState(null);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [admin, setAdmin] = useState(false);
+  const [user, setUser] = useState(null)
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [admin, setAdmin] = useState(false)
+  const [openShopSubmenu, setOpenShopSubmenu] = useState(false)
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
+    const userData = localStorage.getItem('user')
     if (userData) {
       try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        setLoggedIn(true);
-        setAdmin(parsedUser.role === 'admin');
+        const parsedUser = JSON.parse(userData)
+        setUser(parsedUser)
+        setLoggedIn(true)
+        setAdmin(parsedUser.role === 'admin')
       } catch (error) {
-        console.error('Error parsing user:', error);
+        console.error('Error parsing user:', error)
       }
     }
-  }, []);
+  }, [])
 
   const handleNavigate = (path) => {
-    navigate(path);
-    if (isMobile) onClose();
-  };
+    navigate(path)
+    if (isMobile) {
+      onClose()
+    }
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setLoggedIn(false);
-    setUser(null);
-    setAdmin(false);
-    navigate('/');
-    if (isMobile) onClose();
-  };
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setLoggedIn(false)
+    setUser(null)
+    setAdmin(false)
+    if (isMobile) {
+      onClose()
+    }
+    navigate('/')
+  }
+
+  const toggleDarkMode = () => {
+    colorMode.toggleColorMode()
+  }
 
   const isActivePath = (path) => {
-    return location.pathname === path;
-  };
+    return location.pathname === path || location.pathname.startsWith(path + '/')
+  }
+
+  const toggleShopSubmenu = () => {
+    setOpenShopSubmenu(!openShopSubmenu)
+  }
+
+  const isDark = theme.palette.mode === 'dark'
 
   const mainMenuItems = [
     { text: 'خانه', icon: <Home />, path: '/' },
-    { text: 'محصولات', icon: <Storefront />, path: '/products' },
+    { 
+      text: 'محصولات', 
+      icon: <Category />, 
+      path: '/products',
+      submenu: true,
+      subItems: [
+        { text: 'همه محصولات', path: '/products' },
+        { text: 'جدیدترین', path: '/products/new', icon: <NewReleases /> },
+        { text: 'پرفروش‌ترین', path: '/products/popular', icon: <TrendingUp /> },
+        { text: 'حراج‌ها', path: '/sales', icon: <Discount /> },
+      ]
+    },
     { text: 'دسته‌بندی‌ها', icon: <Category />, path: '/categories' },
-    { text: 'فروش ویژه', icon: <Discount />, path: '/sales' },
-    { text: 'علاقه‌مندی‌ها', icon: <Favorite />, path: '/wishlist' },
-  ];
+    { 
+      text: 'فروش ویژه', 
+      icon: <Discount />, 
+      path: '/sales',
+      badge: '🔥',
+    },
+    { 
+      text: 'سبد خرید', 
+      icon: <ShoppingCart />, 
+      path: '/cart',
+      badge: '3',
+    },
+    { 
+      text: 'علاقه‌مندی‌ها', 
+      icon: <Favorite />, 
+      path: '/wishlist',
+      badge: '5',
+    },
+  ]
 
-  const shopMenuItems = [
-    { text: 'سبد خرید', icon: <ShoppingCart />, path: '/cart' },
+  const userMenuItems = [
+    { text: 'پروفایل', icon: <Person />, path: '/profile' },
     { text: 'سفارشات من', icon: <Receipt />, path: '/orders' },
-    { text: 'پرداخت‌ها', icon: <Payment />, path: '/payments' },
-    { text: 'مرجوعی‌ها', icon: <LocalShipping />, path: '/returns' },
-  ];
+    { text: 'علاقه‌مندی‌ها', icon: <Favorite />, path: '/wishlist' },
+    { text: 'تنظیمات', icon: <Settings />, path: '/settings' },
+  ]
 
   const adminMenuItems = [
     { text: 'داشبورد', icon: <Dashboard />, path: '/admin' },
-    { text: 'مدیریت محصولات', icon: <Storefront />, path: '/admin/products' },
-    { text: 'مدیریت سفارشات', icon: <Receipt />, path: '/admin/orders' },
+    { text: 'مدیریت محصولات', icon: <Inventory />, path: '/admin/products' },
+    { text: 'مدیریت سفارشات', icon: <LocalShipping />, path: '/admin/orders' },
     { text: 'مدیریت کاربران', icon: <Person />, path: '/admin/users' },
     { text: 'مدیریت تخفیف‌ها', icon: <Discount />, path: '/admin/discounts' },
-  ];
+    { text: 'گزارشات', icon: <Payment />, path: '/admin/reports' },
+  ]
 
-  const accountMenuItems = [
-    { text: 'پروفایل', icon: <Person />, path: '/profile' },
-    { text: 'تنظیمات', icon: <Settings />, path: '/settings' },
-    { text: 'راهنما', icon: <HelpIcon />, path: '/help' },
-  ];
-
-  return (
-    <StyledDrawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      variant={isMobile ? "temporary" : "persistent"}
-      ModalProps={{
-        keepMounted: true,
-      }}
-      sx={{
-        '& .MuiDrawer-paper': {
-          top: isMobile ? 0 : '72px',
-          height: isMobile ? '100vh' : 'calc(100vh - 72px)',
-          direction: 'rtl',
-          textAlign: 'right',
-        }
-      }}
-    >
-      {/* لوگو */}
-      <LogoBox onClick={() => handleNavigate('/')}>
-        <Typography variant="h6" fontWeight={800} color="white">
-          فروشگاه من
-        </Typography>
-        <Storefront sx={{ color: '#667eea', fontSize: 32 }} />
-      </LogoBox>
-
-      {/* اطلاعات کاربر */}
-      {loggedIn && user ? (
-        <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 2 }}>
-            <Box sx={{ textAlign: 'right' }}>
-              <Typography variant="subtitle1" fontWeight={600} color="white">
-                {user.username}
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)' }}>
-                  {user.role === 'admin' ? 'مدیر فروشگاه' : 'کاربر'}
+  const drawerContent = (
+    <>
+      <ProfileHeader>
+        {isMobile && (
+          <CloseButton onClick={onClose} aria-label="close drawer">
+            <Close sx={{ fontSize: 20 }} />
+          </CloseButton>
+        )}
+        
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: isMobile ? 2 : 0 }}>
+          <StyledAvatar>
+            {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+          </StyledAvatar>
+          <Box sx={{ flex: 1 }}>
+            {loggedIn ? (
+              <>
+                <Typography variant="h6" fontWeight={700} sx={{ textAlign: 'right' }}>
+                  {user?.username || 'کاربر'}
                 </Typography>
-                {user.role === 'admin' && (
-                  <StyledChip label="ادمین" size="small" />
+                <Typography variant="caption" sx={{ opacity: 0.85, display: 'block', textAlign: 'right' }}>
+                  {user?.email || 'ایمیل ثبت نشده'}
+                </Typography>
+                {admin && (
+                  <Chip 
+                    label="مدیر فروشگاه" 
+                    size="small"
+                    sx={{ 
+                      mt: 0.5,
+                      bgcolor: 'rgba(255,255,255,0.2)',
+                      color: 'white',
+                      fontWeight: 600,
+                      borderRadius: 1,
+                      fontSize: '0.65rem',
+                      height: 20,
+                    }}
+                  />
                 )}
-              </Stack>
-            </Box>
-            <Avatar
-              sx={{
-                width: 48,
-                height: 48,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              }}
-            >
-              {user.username?.charAt(0)?.toUpperCase() || 'U'}
-            </Avatar>
+              </>
+            ) : (
+              <>
+                <Typography variant="h6" fontWeight={700} sx={{ textAlign: 'right' }}>
+                  مهمان
+                </Typography>
+                <Typography variant="caption" sx={{ opacity: 0.85, textAlign: 'right' }}>
+                  وارد حساب خود شوید
+                </Typography>
+              </>
+            )}
           </Box>
         </Box>
-      ) : (
-        <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => handleNavigate('/login')}
-            sx={{
-              borderRadius: 2,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              textTransform: 'none',
-              fontWeight: 600,
-              '&:hover': {
-                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-              },
-            }}
-          >
-            ورود به حساب
-          </Button>
-          <Button
-            fullWidth
-            variant="text"
-            onClick={() => handleNavigate('/register')}
-            sx={{
-              color: 'rgba(255,255,255,0.5)',
-              textTransform: 'none',
-              mt: 1,
-              '&:hover': {
-                color: 'white',
-              },
-            }}
-          >
-            ثبت‌نام
-          </Button>
-        </Box>
-      )}
 
-      {/* منوها */}
-      <Box sx={{ overflowY: 'auto', flex: 1, pb: 2 }}>
-        <SectionTitle>منوی اصلی</SectionTitle>
-        <List sx={{ px: 1 }}>
+        {!loggedIn && (
+          <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+            <Button 
+              onClick={() => handleNavigate('/login')}
+              variant="contained"
+              size="small"
+              sx={{
+                flex: 1,
+                bgcolor: 'rgba(255,255,255,0.2)',
+                backdropFilter: 'blur(10px)',
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.3)',
+                },
+              }}
+              startIcon={<Login />}
+            >
+              ورود
+            </Button>
+            <Button 
+              onClick={() => handleNavigate('/register')}
+              variant="contained"
+              size="small"
+              sx={{
+                flex: 1,
+                bgcolor: 'rgba(255,255,255,0.9)',
+                color: '#667eea',
+                textTransform: 'none',
+                fontWeight: 600,
+                '&:hover': {
+                  bgcolor: 'white',
+                },
+              }}
+              startIcon={<AppRegistration />}
+            >
+              ثبت‌نام
+            </Button>
+          </Stack>
+        )}
+      </ProfileHeader>
+
+      <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
+        <List sx={{ width: '100%' }}>
           {mainMenuItems.map((item) => (
-            <StyledListItem
-              key={item.text}
-              active={isActivePath(item.path) ? 1 : 0}
-              onClick={() => handleNavigate(item.path)}
-            >
-              <ListItemIcon sx={{ justifyContent: 'flex-end' }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </StyledListItem>
+            <React.Fragment key={item.text}>
+              {item.submenu ? (
+                <>
+                  <StyledListItem disablePadding>
+                    <StyledListItemButton
+                      selected={isActivePath(item.path)}
+                      onClick={toggleShopSubmenu}
+                      sx={{
+                        borderRadius: '12px',
+                        margin: '2px 12px',
+                      }}
+                    >
+                      <ListItemIcon>{item.icon}</ListItemIcon>
+                      <ListItemText 
+                        primary={item.text}
+                        sx={{
+                          '& .MuiTypography-root': {
+                            textAlign: 'right',
+                            fontSize: '0.95rem',
+                            fontWeight: isActivePath(item.path) ? 600 : 500,
+                          }
+                        }}
+                      />
+                      
+                      {openShopSubmenu ? <ExpandLess /> : <ExpandMore />}
+                    </StyledListItemButton>
+                  </StyledListItem>
+                  <Collapse in={openShopSubmenu} timeout="auto" unmountOnExit>
+                    <List component="div" disablePadding>
+                      {item.subItems.map((subItem) => (
+                        <StyledListItem key={subItem.text} disablePadding>
+                          <StyledListItemButton
+                            selected={isActivePath(subItem.path)}
+                            onClick={() => handleNavigate(subItem.path)}
+                            sx={{
+                              paddingLeft: 4,
+                              margin: '2px 12px',
+                              borderRadius: '12px',
+                            }}
+                          >
+                            <ListItemIcon sx={{ minWidth: 32 }}>
+                              {subItem.icon || <Category />}
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary={subItem.text}
+                              sx={{
+                                '& .MuiTypography-root': {
+                                  textAlign: 'right',
+                                  fontSize: '0.85rem',
+                                  fontWeight: isActivePath(subItem.path) ? 600 : 400,
+                                }
+                              }}
+                            />
+                          </StyledListItemButton>
+                        </StyledListItem>
+                      ))}
+                    </List>
+                  </Collapse>
+                </>
+              ) : (
+                <StyledListItem disablePadding>
+                  <StyledListItemButton
+                    selected={isActivePath(item.path)}
+                    onClick={() => handleNavigate(item.path)}
+                  >
+                    <ListItemIcon>
+                      {item.badge && !item.badge.includes('🔥') ? (
+                        <Badge 
+                          badgeContent={item.badge} 
+                          color="error"
+                          sx={{
+                            '& .MuiBadge-badge': {
+                              fontSize: '0.7rem',
+                              minWidth: 20,
+                              height: 20,
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #ff9800, #f44336)',
+                            }
+                          }}
+                        >
+                          {item.icon}
+                        </Badge>
+                      ) : (
+                        item.icon
+                      )}
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={item.text}
+                      sx={{
+                        '& .MuiTypography-root': {
+                          textAlign: 'right',
+                          fontSize: '0.95rem',
+                          fontWeight: isActivePath(item.path) ? 600 : 500,
+                        }
+                      }}
+                    />
+                    {item.badge === '🔥' && (
+                      <Typography sx={{ fontSize: '1rem' }}>🔥</Typography>
+                    )}
+                  </StyledListItemButton>
+                </StyledListItem>
+              )}
+            </React.Fragment>
           ))}
         </List>
 
-        <SectionTitle>فروشگاه</SectionTitle>
-        <List sx={{ px: 1 }}>
-          {shopMenuItems.map((item) => (
-            <StyledListItem
-              key={item.text}
-              active={isActivePath(item.path) ? 1 : 0}
-              onClick={() => handleNavigate(item.path)}
-            >
-              <ListItemIcon sx={{ justifyContent: 'flex-end' }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </StyledListItem>
-          ))}
-        </List>
+        <Divider sx={{ 
+          mx: 2, 
+          my: 1,
+          borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+        }} />
+
+        {loggedIn && (
+          <List sx={{ width: '100%' }}>
+            <Typography variant="caption" sx={{ px: 3, py: 1, display: 'block', opacity: 0.6, fontWeight: 600, textAlign: 'right' }}>
+              حساب کاربری
+            </Typography>
+            {userMenuItems.map((item) => (
+              <StyledListItem key={item.text} disablePadding>
+                <StyledListItemButton
+                  selected={isActivePath(item.path)}
+                  onClick={() => handleNavigate(item.path)}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText 
+                    primary={item.text}
+                    sx={{
+                      '& .MuiTypography-root': {
+                        textAlign: 'right',
+                        fontSize: '0.9rem',
+                        fontWeight: isActivePath(item.path) ? 600 : 400,
+                      }
+                    }}
+                  />
+                </StyledListItemButton>
+              </StyledListItem>
+            ))}
+          </List>
+        )}
 
         {admin && (
           <>
-            <SectionTitle>مدیریت</SectionTitle>
-            <List sx={{ px: 1 }}>
+            <Divider sx={{ 
+              mx: 2, 
+              my: 1,
+              borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+            }} />
+            <List sx={{ width: '100%' }}>
+              <Typography variant="caption" sx={{ px: 3, py: 1, display: 'block', opacity: 0.6, fontWeight: 600, textAlign: 'right' }}>
+                <AdminPanelSettings sx={{ fontSize: 14, mr: 1, verticalAlign: 'middle' }} />
+                مدیریت
+              </Typography>
               {adminMenuItems.map((item) => (
-                <StyledListItem
-                  key={item.text}
-                  active={isActivePath(item.path) ? 1 : 0}
-                  onClick={() => handleNavigate(item.path)}
-                >
-                  <ListItemIcon sx={{ justifyContent: 'flex-end' }}>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
+                <StyledListItem key={item.text} disablePadding>
+                  <StyledListItemButton
+                    selected={isActivePath(item.path)}
+                    onClick={() => handleNavigate(item.path)}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText 
+                      primary={item.text}
+                      sx={{
+                        '& .MuiTypography-root': {
+                          textAlign: 'right',
+                          fontSize: '0.9rem',
+                          fontWeight: isActivePath(item.path) ? 600 : 400,
+                        }
+                      }}
+                    />
+                  </StyledListItemButton>
                 </StyledListItem>
               ))}
             </List>
           </>
         )}
 
-        {loggedIn && (
-          <>
-            <SectionTitle>حساب کاربری</SectionTitle>
-            <List sx={{ px: 1 }}>
-              {accountMenuItems.map((item) => (
-                <StyledListItem
-                  key={item.text}
-                  active={isActivePath(item.path) ? 1 : 0}
-                  onClick={() => handleNavigate(item.path)}
-                >
-                  <ListItemIcon sx={{ justifyContent: 'flex-end' }}>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </StyledListItem>
-              ))}
-            </List>
-          </>
-        )}
-
-        {loggedIn && (
-          <>
-            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.05)' }} />
-            <List sx={{ px: 1 }}>
-              <StyledListItem onClick={handleLogout} sx={{ color: '#f44336' }}>
-                <ListItemIcon sx={{ color: '#f44336', justifyContent: 'flex-end' }}>
-                  <Logout />
-                </ListItemIcon>
-                <ListItemText primary="خروج" sx={{ color: '#f44336' }} />
-              </StyledListItem>
-            </List>
-          </>
-        )}
-
-        <Box sx={{ px: 3, py: 2, mt: 2, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', display: 'block', textAlign: 'center' }}>
-            © {new Date().getFullYear()} فروشگاه من
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.15)', display: 'block', textAlign: 'center', mt: 0.5 }}>
-            تمامی حقوق محفوظ است
-          </Typography>
+        <Box sx={{ px: 2, py: 1 }}>
+          <Divider sx={{ 
+            mb: 1,
+            borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+          }} />
+          <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5, justifyContent: 'flex-start' }}>
+            <Button
+              size="small"
+              startIcon={<Help />}
+              onClick={() => handleNavigate('/help')}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)',
+                '&:hover': {
+                  bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                },
+              }}
+            >
+              راهنما
+            </Button>
+            <Button
+              size="small"
+              startIcon={<ContactSupport />}
+              onClick={() => handleNavigate('/contact')}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)',
+                '&:hover': {
+                  bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                },
+              }}
+            >
+              تماس با ما
+            </Button>
+          </Stack>
         </Box>
       </Box>
+
+      <FooterBox>
+        <ThemeToggleButton
+          onClick={toggleDarkMode}
+          startIcon={isDark ? <LightMode /> : <DarkMode />}
+        >
+          {isDark ? 'حالت روشن' : 'حالت تاریک'}
+        </ThemeToggleButton>
+        
+        {loggedIn && (
+          <Button
+            onClick={handleLogout}
+            startIcon={<Logout />}
+            sx={{
+              borderRadius: '12px',
+              padding: '10px 16px',
+              justifyContent: 'flex-start',
+              color: '#f44336',
+              textTransform: 'none',
+              width: '100%',
+              mt: 1,
+              gap:1 ,
+              '&:hover': {
+                backgroundColor: 'rgba(244, 67, 54, 0.08)',
+              },
+            }}
+          >
+            خروج از حساب
+          </Button>
+        )}
+
+        <Box sx={{ 
+          mt: 2, 
+          textAlign: 'center',
+          typography: 'caption',
+          color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+        }}>
+          <Storefront sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} />
+          فروشگاه من v1.0
+        </Box>
+      </FooterBox>
+    </>
+  )
+
+  // حالت موبایل - سایدبار از راست باز می‌شود
+  if (isMobile) {
+    return (
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={onClose}
+        variant="temporary"
+        ModalProps={{
+          keepMounted: true,
+        }}
+        transitionDuration={300}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: 300,
+            backgroundColor: isDark ? '#0a0a0a' : '#ffffff',
+            direction: 'rtl',
+            boxShadow: isDark 
+              ? '-4px 0 30px rgba(0,0,0,0.5)'
+              : '-4px 0 30px rgba(0,0,0,0.08)',
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+    )
+  }
+
+  // حالت دسکتاپ - سایدبار در سمت راست ثابت است
+  return (
+    <StyledDrawer
+      variant="permanent"
+      open={true}
+      sx={{
+        display: { xs: 'none', md: 'block' },
+        width: 280,
+        flexShrink: 0,
+      }}
+    >
+      {drawerContent}
     </StyledDrawer>
-  );
+  )
 }

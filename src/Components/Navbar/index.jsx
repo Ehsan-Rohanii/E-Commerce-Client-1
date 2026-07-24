@@ -19,7 +19,6 @@ import {
   Fade,
   Stack,
   Chip,
-  alpha,
   TextField,
   InputAdornment,
   Divider,
@@ -54,17 +53,17 @@ const StyledAppBar = styled(AppBar, {
 })(({ theme, scrolled }) => ({
   position: 'sticky',
   elevation: scrolled ? 4 : 0,
-  backgroundColor: '#0a0a0a',
+  backgroundColor: theme.palette.mode === 'dark' ? '#0a0a0a' : '#ffffff',
   backdropFilter: 'blur(20px)',
   borderBottom: scrolled 
     ? 'none' 
-    : '1px solid rgba(255,255,255,0.05)',
+    : `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   boxShadow: scrolled 
-    ? '0 4px 30px rgba(0,0,0,0.5)' 
+    ? `0 4px 30px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(255,140,0,0.15)'}` 
     : 'none',
   direction: 'rtl',
-  color: '#ffffff',
+  color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
 }));
 
 const LogoText = styled(Typography)(({ theme }) => ({
@@ -74,24 +73,30 @@ const LogoText = styled(Typography)(({ theme }) => ({
   alignItems: 'center',
   fontSize: '1.5rem',
   letterSpacing: '-0.5px',
-  color: '#ffffff',
+  color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
   '&:hover': {
     transform: 'scale(1.02)',
     transition: 'transform 0.3s ease',
   },
+  flexShrink: 0,
 }));
 
 const NavButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'active',
 })(({ theme, active }) => ({
-  color: active ? '#667eea' : 'rgba(255,255,255,0.7)',
+  color: active 
+    ? '#FF8C00' 
+    : theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.7)' 
+      : 'rgba(0,0,0,0.6)',
   fontWeight: active ? 600 : 500,
   position: 'relative',
   borderRadius: '12px',
-  padding: '8px 20px',
+  padding: '8px 16px',
   textTransform: 'none',
-  fontSize: '0.95rem',
+  fontSize: '0.9rem',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  minWidth: 'auto',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -100,20 +105,22 @@ const NavButton = styled(Button, {
     transform: active ? 'translateX(-50%) scaleX(1)' : 'translateX(-50%) scaleX(0)',
     width: '30%',
     height: 3,
-    background: 'linear-gradient(90deg, #667eea, #764ba2)',
+    background: 'linear-gradient(90deg, #FF6F00, #FF8C00, #FFA726)',
     borderRadius: 4,
     transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   },
   '&:hover': {
-    color: '#ffffff',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.08)' 
+      : 'rgba(0,0,0,0.04)',
     transform: 'translateY(-1px)',
     '&::before': {
       transform: 'translateX(-50%) scaleX(1)',
     },
   },
   '& .MuiButton-startIcon': {
-    marginLeft: 8,
+    marginLeft: 6,
     marginRight: 0,
   },
 }));
@@ -121,48 +128,53 @@ const NavButton = styled(Button, {
 const AdminButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'active',
 })(({ theme, active }) => ({
-  color: '#ff9800',
+  color: '#FF8C00',
   fontWeight: active ? 600 : 500,
-  backgroundColor: active ? 'rgba(255,152,0,0.15)' : 'transparent',
+  backgroundColor: active ? 'rgba(255,140,0,0.15)' : 'transparent',
   borderRadius: '12px',
-  padding: '8px 20px',
+  padding: '8px 16px',
   textTransform: 'none',
-  fontSize: '0.95rem',
+  fontSize: '0.9rem',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  minWidth: 'auto',
   '&:hover': {
-    backgroundColor: 'rgba(255,152,0,0.2)',
+    backgroundColor: 'rgba(255,140,0,0.2)',
     transform: 'translateY(-1px)',
-    boxShadow: '0 4px 15px rgba(255, 152, 0, 0.2)',
+    boxShadow: '0 4px 15px rgba(255,140,0,0.2)',
   },
   '& .MuiButton-startIcon': {
-    marginLeft: 8,
+    marginLeft: 6,
     marginRight: 0,
   },
 }));
 
 const ActionIconButton = styled(IconButton)(({ theme }) => ({
-  color: 'rgba(255,255,255,0.6)',
-  padding: 8,
+  color: theme.palette.mode === 'dark' 
+    ? 'rgba(255,255,255,0.6)' 
+    : 'rgba(0,0,0,0.4)',
+  padding: 6,
   borderRadius: '12px',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    color: '#ffffff',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    color: theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.08)' 
+      : 'rgba(0,0,0,0.04)',
     transform: 'scale(1.05)',
   },
 }));
 
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 38,
-  height: 38,
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  width: 34,
+  height: 34,
+  background: 'linear-gradient(135deg, #FF6F00 0%, #FF8C00 50%, #FFA726 100%)',
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   border: '2px solid transparent',
   '&:hover': {
     transform: 'scale(1.08)',
-    borderColor: '#667eea',
-    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+    borderColor: '#FF8C00',
+    boxShadow: '0 4px 20px rgba(255,140,0,0.3)',
   },
 }));
 
@@ -171,16 +183,22 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
   margin: '4px 8px',
   padding: '10px 16px',
   transition: 'all 0.2s ease',
-  color: 'rgba(255,255,255,0.8)',
+  color: theme.palette.mode === 'dark' 
+    ? 'rgba(255,255,255,0.8)' 
+    : 'rgba(0,0,0,0.7)',
   '&:hover': {
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.08)' 
+      : 'rgba(0,0,0,0.04)',
     transform: 'translateX(-4px)',
   },
   '& .MuiListItemIcon-root': {
-    minWidth: 40,
+    minWidth: 36,
     marginLeft: 8,
     marginRight: 0,
-    color: 'rgba(255,255,255,0.6)',
+    color: theme.palette.mode === 'dark' 
+      ? 'rgba(255,255,255,0.6)' 
+      : 'rgba(0,0,0,0.4)',
   },
 }));
 
@@ -189,6 +207,8 @@ export default function Navbar({ onMenuClick }) {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const colorMode = useContext(ColorModeContext);
   
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -286,23 +306,45 @@ export default function Navbar({ onMenuClick }) {
 
   return (
     <StyledAppBar position="sticky" scrolled={scrolled}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ height: 72, display: 'flex', alignItems: 'center', gap: 1, direction: 'rtl' }}>
-          
-          {/* دکمه همبرگری */}
-          <ActionIconButton onClick={onMenuClick}>
-            <MenuIcon />
-          </ActionIconButton>
-          
-          <LogoText onClick={() => handleNavigate('/')}>
-            <Storefront sx={{ 
-              mr: 1, 
-              color: '#667eea',
-              fontSize: isMobile ? '1.3rem' : '1.8rem',
-            }} />
-            فروشگاه من
-          </LogoText>
+      <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+        <Toolbar 
+          disableGutters 
+          sx={{ 
+            height: { xs: 64, sm: 68, md: 72 }, 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 0.5, sm: 1 },
+            direction: 'rtl',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* بخش چپ - دکمه همبرگری و لوگو */}
+          <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+            {isMobile && (
+              <ActionIconButton onClick={onMenuClick} sx={{ ml: { xs: 0, sm: 0.5 } }}>
+                <MenuIcon />
+              </ActionIconButton>
+            )}
+            
+            <LogoText 
+              onClick={() => handleNavigate('/')}
+              sx={{
+                fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
+                '& .MuiSvgIcon-root': {
+                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.8rem' },
+                }
+              }}
+            >
+              <Storefront sx={{ 
+                mr: 0.5, 
+                color: '#FF8C00',
+              }} />
+              {!isSmallMobile && 'فروشگاه من'}
+              {isSmallMobile && 'فروشگاه'}
+            </LogoText>
+          </Box>
 
+          {/* بخش وسط - منوی دسکتاپ */}
           {!isMobile && (
             <Box sx={{ 
               display: 'flex', 
@@ -311,6 +353,7 @@ export default function Navbar({ onMenuClick }) {
               flex: 1, 
               justifyContent: 'center',
               direction: 'rtl',
+              mx: 2,
             }}>
               {menuItems.map((item) => (
                 <NavButton
@@ -318,6 +361,10 @@ export default function Navbar({ onMenuClick }) {
                   onClick={() => handleNavigate(item.path)}
                   startIcon={item.icon}
                   active={isActivePath(item.path) ? 1 : 0}
+                  sx={{ 
+                    px: { md: 1.5, lg: 2 },
+                    fontSize: { md: '0.85rem', lg: '0.95rem' },
+                  }}
                 >
                   {item.text}
                 </NavButton>
@@ -327,45 +374,45 @@ export default function Navbar({ onMenuClick }) {
                 component="form" 
                 onSubmit={handleSearch}
                 sx={{ 
-                  mx: 2,
-                  minWidth: 200,
-                  maxWidth: 300,
+                  mx: 1,
+                  minWidth: { md: 150, lg: 200 },
+                  maxWidth: { md: 200, lg: 300 },
                   flex: 1,
                 }}
               >
                 <TextField
                   size="small"
-                  placeholder="جستجوی محصول..."
+                  placeholder="جستجو..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 3,
-                      backgroundColor: 'rgba(255,255,255,0.05)',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
                       '& fieldset': {
-                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
                       },
                       '&:hover fieldset': {
-                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderColor: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
                       },
                       '&.Mui-focused fieldset': {
-                        borderColor: '#667eea',
+                        borderColor: '#FF8C00',
                       },
                       '& input': {
-                        color: '#ffffff',
+                        color: isDark ? '#ffffff' : '#000000',
+                        fontSize: { md: '0.8rem', lg: '0.9rem' },
+                        padding: '8px 12px',
                       },
-                    },
-                    '& input': {
-                      padding: '10px 14px',
-                      fontSize: '0.9rem',
-                      textAlign: 'right',
                     },
                   }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Search sx={{ color: 'rgba(255,255,255,0.4)', fontSize: 20 }} />
+                        <Search sx={{ 
+                          color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)', 
+                          fontSize: 18 
+                        }} />
                       </InputAdornment>
                     ),
                   }}
@@ -377,6 +424,10 @@ export default function Navbar({ onMenuClick }) {
                   onClick={() => handleNavigate('/admin')}
                   startIcon={<AdminPanelSettings />}
                   active={isActivePath('/admin') ? 1 : 0}
+                  sx={{ 
+                    px: { md: 1.5, lg: 2 },
+                    fontSize: { md: '0.85rem', lg: '0.95rem' },
+                  }}
                 >
                   مدیریت
                 </AdminButton>
@@ -384,75 +435,87 @@ export default function Navbar({ onMenuClick }) {
             </Box>
           )}
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          {/* بخش راست - آیکون‌ها */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 0.5, sm: 0.5, md: 1 },
+            flexShrink: 0,
+          }}>
             {isMobile && (
-              <ActionIconButton onClick={() => navigate('/search')}>
-                <Search />
+              <ActionIconButton onClick={() => navigate('/search')} size="small">
+                <Search sx={{ fontSize: { xs: 20, sm: 22 } }} />
               </ActionIconButton>
             )}
             
-            <ActionIconButton onClick={() => navigate('/wishlist')}>
+            <ActionIconButton onClick={() => navigate('/wishlist')} size="small">
               <Badge 
                 badgeContent={5} 
                 color="error"
                 sx={{
                   '& .MuiBadge-badge': {
-                    fontSize: '0.6rem',
-                    minWidth: 18,
-                    height: 18,
+                    fontSize: { xs: '0.5rem', sm: '0.6rem' },
+                    minWidth: { xs: 16, sm: 18 },
+                    height: { xs: 16, sm: 18 },
                     borderRadius: '50%',
                     backgroundColor: '#f44336',
                   }
                 }}
               >
-                <Favorite />
+                <Favorite sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </Badge>
             </ActionIconButton>
 
-            <ActionIconButton onClick={handleOpenNotifications}>
+            <ActionIconButton onClick={handleOpenNotifications} size="small">
               <Badge 
                 badgeContent={3} 
                 color="error"
                 sx={{
                   '& .MuiBadge-badge': {
-                    fontSize: '0.6rem',
-                    minWidth: 18,
-                    height: 18,
+                    fontSize: { xs: '0.5rem', sm: '0.6rem' },
+                    minWidth: { xs: 16, sm: 18 },
+                    height: { xs: 16, sm: 18 },
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #f44336, #e91e63)',
+                    background: 'linear-gradient(135deg, #FF6F00, #FF8C00)',
                   }
                 }}
               >
-                <Notifications />
+                <Notifications sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </Badge>
             </ActionIconButton>
 
-            <ActionIconButton onClick={() => navigate('/cart')}>
+            <ActionIconButton onClick={() => navigate('/cart')} size="small">
               <Badge 
                 badgeContent={cartCount} 
                 color="error"
                 sx={{
                   '& .MuiBadge-badge': {
-                    fontSize: '0.6rem',
-                    minWidth: 18,
-                    height: 18,
+                    fontSize: { xs: '0.5rem', sm: '0.6rem' },
+                    minWidth: { xs: 16, sm: 18 },
+                    height: { xs: 16, sm: 18 },
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #ff9800, #f44336)',
+                    background: 'linear-gradient(135deg, #FF8C00, #FF6F00)',
                   }
                 }}
               >
-                <ShoppingCart />
+                <ShoppingCart sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
               </Badge>
             </ActionIconButton>
 
-            <ActionIconButton onClick={toggleDarkMode}>
-              {isDark ? <LightMode /> : <DarkMode />}
+            <ActionIconButton onClick={toggleDarkMode} size="small" sx={{ display: { xs: 'none', sm: 'flex' } }}>
+              {isDark ? <LightMode sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} /> : <DarkMode sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />}
             </ActionIconButton>
 
             {loggedIn ? (
               <>
                 <Tooltip title="حساب کاربری" arrow>
-                  <StyledAvatar onClick={handleOpenUserMenu}>
+                  <StyledAvatar 
+                    onClick={handleOpenUserMenu}
+                    sx={{ 
+                      width: { xs: 30, sm: 34, md: 38 },
+                      height: { xs: 30, sm: 34, md: 38 },
+                    }}
+                  >
                     {user?.username?.charAt(0)?.toUpperCase() || 'U'}
                   </StyledAvatar>
                 </Tooltip>
@@ -467,21 +530,23 @@ export default function Navbar({ onMenuClick }) {
                     sx: {
                       mt: 1.5,
                       borderRadius: 3,
-                      minWidth: 260,
-                      boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+                      minWidth: { xs: 220, sm: 260 },
+                      boxShadow: isDark 
+                        ? '0 8px 40px rgba(0,0,0,0.5)' 
+                        : '0 8px 40px rgba(255,140,0,0.12)',
                       overflow: 'hidden',
                       direction: 'rtl',
-                      bgcolor: '#0a0a0a',
-                      border: '1px solid rgba(255,255,255,0.05)',
+                      bgcolor: isDark ? '#0a0a0a' : '#ffffff',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,140,0,0.1)'}`,
                     }
                   }}
                 >
                   <Box sx={{ 
-                    p: 2.5, 
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    p: { xs: 2, sm: 2.5 }, 
+                    background: 'linear-gradient(135deg, #FF6F00 0%, #FF8C00 50%, #FFA726 100%)',
                     color: 'white',
                   }}>
-                    <Typography variant="subtitle1" fontWeight={700}>
+                    <Typography variant="subtitle1" fontWeight={700} fontSize={{ xs: '0.9rem', sm: '1rem' }}>
                       {user?.username}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.85 }}>
@@ -497,11 +562,13 @@ export default function Navbar({ onMenuClick }) {
                           color: 'white',
                           fontWeight: 600,
                           borderRadius: 1,
+                          height: { xs: 20, sm: 24 },
+                          fontSize: { xs: '0.6rem', sm: '0.7rem' },
                         }}
                       />
                     )}
                   </Box>
-                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
+                  <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
                   <StyledMenuItem onClick={() => handleNavigate('/profile')}>
                     <ListItemIcon><Person fontSize="small" /></ListItemIcon>
                     پروفایل
@@ -524,7 +591,7 @@ export default function Navbar({ onMenuClick }) {
                       پنل مدیریت
                     </StyledMenuItem>
                   )}
-                  <Divider sx={{ borderColor: 'rgba(255,255,255,0.05)' }} />
+                  <Divider sx={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
                   <StyledMenuItem onClick={handleLogout} sx={{ color: '#f44336' }}>
                     <ListItemIcon><Logout fontSize="small" sx={{ color: '#f44336' }} /></ListItemIcon>
                     خروج
@@ -532,7 +599,7 @@ export default function Navbar({ onMenuClick }) {
                 </Menu>
               </>
             ) : (
-              <Stack direction="row" spacing={1} sx={{ mr: 1 }}>
+              <Stack direction="row" spacing={0.5} sx={{ mr: 0.5 }}>
                 <Button 
                   onClick={() => handleNavigate('/login')} 
                   variant="outlined" 
@@ -540,21 +607,19 @@ export default function Navbar({ onMenuClick }) {
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',
-                    borderColor: 'rgba(255,255,255,0.2)',
-                    color: 'rgba(255,255,255,0.8)',
-                    px: 2.5,
-                    py: 0.8,
+                    borderColor: isDark ? 'rgba(255,255,255,0.2)' : '#FF8C00',
+                    color: isDark ? 'rgba(255,255,255,0.8)' : '#FF8C00',
+                    px: { xs: 1.5, sm: 2 },
+                    py: 0.5,
                     fontWeight: 600,
+                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
                     '&:hover': {
-                      borderColor: '#667eea',
-                      bgcolor: 'rgba(255,255,255,0.05)',
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.2)',
+                      borderColor: '#FF6F00',
+                      bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,140,0,0.08)',
                     },
-                    transition: 'all 0.3s ease',
                   }}
                 >
-                  ورود
+                  {isSmallMobile ? 'ورود' : 'ورود'}
                 </Button>
                 <Button 
                   onClick={() => handleNavigate('/register')} 
@@ -563,19 +628,18 @@ export default function Navbar({ onMenuClick }) {
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    px: 2.5,
-                    py: 0.8,
+                    background: 'linear-gradient(135deg, #FF6F00, #FF8C00, #FFA726)',
+                    px: { xs: 1.5, sm: 2 },
+                    py: 0.5,
                     fontWeight: 600,
-                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+                    fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                    boxShadow: '0 4px 15px rgba(255,140,0,0.3)',
                     '&:hover': {
-                      boxShadow: '0 6px 25px rgba(102, 126, 234, 0.4)',
-                      transform: 'translateY(-2px)',
+                      boxShadow: '0 6px 25px rgba(255,140,0,0.4)',
                     },
-                    transition: 'all 0.3s ease',
                   }}
                 >
-                  ثبت‌نام
+                  {isSmallMobile ? 'ثبت‌نام' : 'ثبت‌نام'}
                 </Button>
               </Stack>
             )}

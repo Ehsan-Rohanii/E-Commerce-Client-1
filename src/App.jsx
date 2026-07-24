@@ -6,7 +6,7 @@ import { CssBaseline } from '@mui/material';
 import router from './Routes';
 
 // ✅ صادر کردن Context برای استفاده در سایر کامپوننت‌ها
-export const ColorModeContext = createContext({ toggleColorMode: () => {} });
+export const ColorModeContext = createContext({ toggleColorMode: () => {}, mode: 'light' });
 
 export default function App() {
   const [mode, setMode] = useState(() => {
@@ -24,8 +24,9 @@ export default function App() {
           return newMode;
         });
       },
+      mode: mode, // ✅ این خط رو اضافه کن
     }),
-    [],
+    [mode], // ✅ وابستگی به mode
   );
 
   const theme = useMemo(
