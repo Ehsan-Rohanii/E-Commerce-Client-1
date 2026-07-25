@@ -1,4 +1,4 @@
-// SideBar.jsx
+// components/common/SideBar.jsx
 import React, { useState, useEffect, useContext } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
@@ -69,14 +69,13 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
     borderLeft: 'none',
     boxShadow: theme.palette.mode === 'dark' 
       ? '4px 0 30px rgba(0,0,0,0.5)'
-      : '4px 0 30px rgba(0,0,0,0.05)',
+      : '4px 0 30px rgba(255,140,0,0.08)',
     paddingTop: 0,
     direction: 'rtl',
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
     overflow: 'hidden',
-    // برای دسکتاپ ثابت می‌شود و در سمت راست قرار می‌گیرد
     [theme.breakpoints.up('md')]: {
       position: 'fixed',
       top: NAVBAR_HEIGHT.md,
@@ -88,7 +87,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 }))
 
 const ProfileHeader = styled(Box)(({ theme }) => ({
-  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  background: 'linear-gradient(135deg, #FF6F00 0%, #FF8C00 50%, #FFA726 100%)',
   padding: '24px 20px 32px 20px',
   color: 'white',
   position: 'relative',
@@ -156,16 +155,16 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     : 'rgba(0,0,0,0.6)',
   '&.Mui-selected': {
     backgroundColor: theme.palette.mode === 'dark' 
-      ? 'rgba(102, 126, 234, 0.15)' 
-      : 'rgba(102, 126, 234, 0.08)',
-    color: '#667eea',
+      ? 'rgba(255,140,0,0.15)' 
+      : 'rgba(255,140,0,0.08)',
+    color: '#FF8C00',
     '& .MuiListItemIcon-root': {
-      color: '#667eea',
+      color: '#FF8C00',
     },
     '&:hover': {
       backgroundColor: theme.palette.mode === 'dark' 
-        ? 'rgba(102, 126, 234, 0.25)' 
-        : 'rgba(102, 126, 234, 0.12)',
+        ? 'rgba(255,140,0,0.25)' 
+        : 'rgba(255,140,0,0.12)',
     },
   },
   '&:hover': {
@@ -400,7 +399,7 @@ export default function SideBar({ open, onClose }) {
               sx={{
                 flex: 1,
                 bgcolor: 'rgba(255,255,255,0.9)',
-                color: '#667eea',
+                color: '#FF8C00',
                 textTransform: 'none',
                 fontWeight: 600,
                 '&:hover': {
@@ -494,7 +493,7 @@ export default function SideBar({ open, onClose }) {
                               minWidth: 20,
                               height: 20,
                               borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #ff9800, #f44336)',
+                              background: 'linear-gradient(135deg, #FF6F00, #FF8C00)',
                             }
                           }}
                         >
@@ -672,7 +671,7 @@ export default function SideBar({ open, onClose }) {
           typography: 'caption',
           color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
         }}>
-          <Storefront sx={{ fontSize: 16, verticalAlign: 'middle', mr: 0.5 }} />
+          <Storefront sx={{ fontSize: 16, verticalAlign: 'middle', color: '#FF8C00' }} />
           فروشگاه من v1.0
         </Box>
       </FooterBox>
@@ -699,7 +698,7 @@ export default function SideBar({ open, onClose }) {
             direction: 'rtl',
             boxShadow: isDark 
               ? '-4px 0 30px rgba(0,0,0,0.5)'
-              : '-4px 0 30px rgba(0,0,0,0.08)',
+              : '-4px 0 30px rgba(255,140,0,0.12)',
           },
         }}
       >
