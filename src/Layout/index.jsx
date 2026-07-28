@@ -18,7 +18,7 @@ export default function Layout() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' , background:"/assets/blackbackground.jpg"}}>
       <Navbar onMenuClick={toggleSidebar} />
       
       <Box sx={{ display: 'flex', flex: 1 }}>

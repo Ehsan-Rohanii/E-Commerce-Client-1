@@ -6,6 +6,7 @@ import Home from "../Pages/Home";
 import LoginOtp from "../Pages/Auth/LoginOtp";
 import Slider from "../Components/Slider";
 import Categories from "../Pages/Categories";
+import Brands from "../Pages/Brands";
 
 
 
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
                 path:"categories" ,
                 element:<Categories/>
             },
+            {
+                path:"brands" ,
+                element:<Brands/>
+            }
         ],
     },
 
