@@ -393,7 +393,7 @@ export default function SideBar({ open, onClose }) {
               ورود
             </Button>
             <Button 
-              onClick={() => handleNavigate('/register')}
+              onClick={() => navigate('/register')}
               variant="contained"
               size="small"
               sx={{
