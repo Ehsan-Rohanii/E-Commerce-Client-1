@@ -7,6 +7,7 @@ import {
   Typography,
   Alert,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -51,7 +52,7 @@ export default function Login() {
       console.log(result);
       localStorage.setItem("token", result.token);
       localStorage.setItem("user", JSON.stringify(result.user));
-      navigate("/home");
+      navigate("/latout");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -66,9 +67,10 @@ export default function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#0a0a0a",
+        // backgroundColor: "#0a0a0a",
         padding: "16px",
         direction: "rtl",
+        backgroundImage:"blackbackground.jpg"
       }}
     >
       <Container maxWidth="sm">
@@ -298,7 +300,7 @@ export default function Login() {
                     color: "rgba(255, 255, 255, 0.6)",
                   },
                 }}
-                onClick={() => navigate("/forgot-password")}
+                onClick={() => navigate("/loginOtp")}
               >
                 رمز عبور را فراموش کرده‌اید؟
               </Typography>
