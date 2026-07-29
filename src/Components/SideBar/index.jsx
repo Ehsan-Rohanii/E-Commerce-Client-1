@@ -223,17 +223,39 @@ export default function SideBar({ open, onClose }) {
   const [admin, setAdmin] = useState(false)
   const [openShopSubmenu, setOpenShopSubmenu] = useState(false)
 
+  // تابع کمکی برای دریافت نام کاربر
+  const getUserDisplayName = (userData) => {
+    if (!userData) return 'مهمان'
+    return userData.fullName || userData.fullname || userData.phoneNumber || 'کاربر'
+  }
+
+  // تابع کمکی برای دریافت حرف اول نام کاربر
+  const getUserInitial = (userData) => {
+    if (!userData) return 'U'
+    const name = userData.fullName || userData.fullname || userData.phoneNumber || ''
+    return name.charAt(0)?.toUpperCase() || 'U'
+  }
+
   useEffect(() => {
     const userData = localStorage.getItem('user')
+    console.log('Raw user data from storage:', userData)
+    
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData)
+        console.log('Parsed user:', parsedUser)
+        
         setUser(parsedUser)
         setLoggedIn(true)
         setAdmin(parsedUser.role === 'admin')
       } catch (error) {
         console.error('Error parsing user:', error)
+        setLoggedIn(false)
+        setUser(null)
       }
+    } else {
+      setLoggedIn(false)
+      setUser(null)
     }
   }, [])
 
@@ -247,13 +269,14 @@ export default function SideBar({ open, onClose }) {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('isLoggedIn')
     setLoggedIn(false)
     setUser(null)
     setAdmin(false)
     if (isMobile) {
       onClose()
     }
-    navigate('/')
+    navigate('/login')
   }
 
   const toggleDarkMode = () => {
@@ -332,16 +355,16 @@ export default function SideBar({ open, onClose }) {
         
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: isMobile ? 2 : 0 }}>
           <StyledAvatar>
-            {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+            {loggedIn ? getUserInitial(user) : 'U'}
           </StyledAvatar>
           <Box sx={{ flex: 1 }}>
             {loggedIn ? (
               <>
                 <Typography variant="h6" fontWeight={700} sx={{ textAlign: 'right' }}>
-                  {user?.username || 'کاربر'}
+                  {getUserDisplayName(user)}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.85, display: 'block', textAlign: 'right' }}>
-                  {user?.email || 'ایمیل ثبت نشده'}
+                  {user?.phoneNumber || user?.email || 'شماره موبایل ثبت نشده'}
                 </Typography>
                 {admin && (
                   <Chip 
@@ -440,7 +463,6 @@ export default function SideBar({ open, onClose }) {
                           }
                         }}
                       />
-                      
                       {openShopSubmenu ? <ExpandLess /> : <ExpandMore />}
                     </StyledListItemButton>
                   </StyledListItem>
@@ -655,7 +677,7 @@ export default function SideBar({ open, onClose }) {
               textTransform: 'none',
               width: '100%',
               mt: 1,
-              gap:1 ,
+              gap: 1,
               '&:hover': {
                 backgroundColor: 'rgba(244, 67, 54, 0.08)',
               },
