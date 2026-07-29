@@ -317,7 +317,7 @@ export default function SideBar({ open, onClose }) {
     { 
       text: 'سبد خرید', 
       icon: <ShoppingCart />, 
-      path: '/cart',
+      path: '/order',
       badge: '3',
     },
     { 
