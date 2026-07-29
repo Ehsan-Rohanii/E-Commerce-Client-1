@@ -1,47 +1,54 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../Layout";
 import Register from "../Pages/Auth/Register";
-import Login from "../Pages/Auth/Login";
 import Home from "../Pages/Home";
 import LoginOtp from "../Pages/Auth/LoginOtp";
 import Slider from "../Components/Slider";
 import Categories from "../Pages/Categories";
 import Brands from "../Pages/Brands";
-
-
-
+import LoginPass from "../Pages/Auth/LoginPass";
+import Login from "../Pages/Auth/Login";
+import Profile from "../Pages/Profile";
 
 const router = createBrowserRouter([
     {
-        path:"/register",
-        element:<Register/>
+        path: "/register",
+        element: <Register />
     },
     {
-        path:"/login",
-        element: <Login/>
+        path: "/login",
+        element: <Login />
     },
     {
-        path:"/loginOtp" ,
-        element:<LoginOtp/>
+        path: "/loginPass",
+        element: <LoginPass />
     },
     {
-        path:"/",
-        element: <Layout/>,
+        path: "/loginOtp",
+        element: <LoginOtp />
+    },
+    {
+        path: "/",
+        element: <Layout />,
         children: [
             {
-                index:true ,
-                element:<Home/>,
+                index: true, // این یعنی مسیر "/" خودش Home را نشان می‌دهد
+                element: <Home />,
             },
             {
-                path:"categories" ,
-                element:<Categories/>
+                path: "categories",
+                element: <Categories />
             },
             {
-                path:"brands" ,
-                element:<Brands/>
+                path: "brands",
+                element: <Brands />
             }
         ],
     },
+    {
+        path:"/profile" ,
+        element:<Profile/>
+    },
+]);
 
-])
-export default router ;
+export default router;
