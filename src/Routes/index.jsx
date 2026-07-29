@@ -9,6 +9,7 @@ import Brands from "../Pages/Brands";
 import LoginPass from "../Pages/Auth/LoginPass";
 import Login from "../Pages/Auth/Login";
 import Profile from "../Pages/Profile";
+import Order from "../Pages/Order";
 
 const router = createBrowserRouter([
     {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
     {
         path:"/profile" ,
         element:<Profile/>
+    },
+    {
+        path:"/order" ,
+        element:<Order/>
     },
 ]);
 
