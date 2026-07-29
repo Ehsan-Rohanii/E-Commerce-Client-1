@@ -226,24 +226,54 @@ export default function Navbar({ onMenuClick }) {
 
   const cartCount = 3;
 
+  // ✅ یک useEffect برای گرفتن user از localStorage
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    if (userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        setLoggedIn(true);
-        setAdmin(parsedUser.role === "admin");
-      } catch (error) {
-        console.error("Error parsing user:", error);
+    const loadUserData = () => {
+      const userData = localStorage.getItem("user");
+      console.log("📦 Raw user data from storage:", userData);
+      
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          console.log("👤 Parsed user:", parsedUser);
+          
+          setUser(parsedUser);
+          setLoggedIn(true);
+          setAdmin(parsedUser.role === "admin");
+        } catch (error) {
+          console.error("❌ Error parsing user:", error);
+          setLoggedIn(false);
+          setUser(null);
+          setAdmin(false);
+        }
+      } else {
+        console.log("ℹ️ No user data found in localStorage");
+        setLoggedIn(false);
+        setUser(null);
+        setAdmin(false);
       }
-    }
+    };
+
+    loadUserData();
 
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    // ✅ گوش دادن به تغییرات localStorage
+    const handleStorageChange = (e) => {
+      if (e.key === "user") {
+        console.log("🔄 User data changed in localStorage");
+        loadUserData();
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const handleNavigate = (path) => {
@@ -301,14 +331,20 @@ export default function Navbar({ onMenuClick }) {
     { text: "فروش ویژه", icon: <Discount />, path: "/sales" },
   ];
 
-  const userMenuItems = [
-    { text: "پروفایل", icon: <Person />, path: "/profile" },
-    { text: "سفارشات من", icon: <Receipt />, path: "/orders" },
-    { text: "علاقه‌مندی‌ها", icon: <Favorite />, path: "/wishlist" },
-    { text: "تنظیمات", icon: <Settings />, path: "/settings" },
-  ];
-
   const isDark = theme.palette.mode === "dark";
+
+  // ✅ دریافت حرف اول نام کاربر با مدیریت خطا
+  const getUserInitial = () => {
+    if (!user) return "U";
+    const name = user.fullName || "";
+    return name.charAt(0)?.toUpperCase() || "U";
+  };
+
+  // ✅ دریافت نام کامل کاربر با مدیریت خطا
+  const getFullName = () => {
+    if (!user) return "کاربر";
+    return user.fullname || user.fullName || user.name || user.username || "کاربر";
+  };
 
   return (
     <StyledAppBar position="sticky" scrolled={scrolled}>
@@ -555,7 +591,7 @@ export default function Navbar({ onMenuClick }) {
                       height: { xs: 30, sm: 34, md: 38 },
                     }}
                   >
-                    {user?.username?.charAt(0)?.toUpperCase() || "U"}
+                    {getUserInitial()}
                   </StyledAvatar>
                 </Tooltip>
                 <Menu
@@ -593,7 +629,7 @@ export default function Navbar({ onMenuClick }) {
                       fontWeight={700}
                       fontSize={{ xs: "0.9rem", sm: "1rem" }}
                     >
-                      {user?.username}
+                      {getFullName()}
                     </Typography>
                     <Typography variant="caption" sx={{ opacity: 0.85 }}>
                       {user?.role === "admin" ? "مدیر فروشگاه" : "کاربر"}
