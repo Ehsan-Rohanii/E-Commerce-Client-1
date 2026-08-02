@@ -34,8 +34,8 @@ const router = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                index: true, // این یعنی مسیر "/" خودش Home را نشان می‌دهد
-                element: <Home />,
+                index: true ,
+                element: <Home /> ,
             },
             {
                 path: "categories",

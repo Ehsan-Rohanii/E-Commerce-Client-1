@@ -8,26 +8,60 @@ import {
   Pagination,
   Container,
   useTheme,
+  Snackbar,
 } from '@mui/material';
 import ProductCard from './ProductCard';
 
 const processProductToCard = (product) => {
   if (!product) return null;
-  const defaultVariant = product.defaultProductVariantId || {};
+  
+  console.log('🔄 Processing product:', product._id);
+  console.log('📦 Product variants:', product.productVariantIds);
+  
+  let defaultVariant = null;
+  let defaultVariantId = null;
+  let inStock = false;
+  
+  if (product.productVariantIds && Array.isArray(product.productVariantIds) && product.productVariantIds.length > 0) {
+    console.log('✅ Product has variants, count:', product.productVariantIds.length);
+    
+    if (product.defaultProductVariantId) {
+      console.log('🎯 Using defaultProductVariantId:', product.defaultProductVariantId);
+      defaultVariant = product.defaultProductVariantId;
+      defaultVariantId = defaultVariant._id || defaultVariant.id;
+      console.log('🎯 defaultVariantId from defaultProductVariantId:', defaultVariantId);
+    } else {
+      console.log('🔄 No defaultProductVariantId, using first variant');
+      defaultVariant = product.productVariantIds[0];
+      defaultVariantId = defaultVariant._id || defaultVariant.id;
+      console.log('🔄 defaultVariantId from first variant:', defaultVariantId);
+    }
+    
+    console.log('📋 Selected variant full object:', defaultVariant);
+    
+    if (defaultVariant) {
+      inStock = (defaultVariant.quantity && defaultVariant.quantity > 0) || false;
+      console.log('📊 Variant quantity:', defaultVariant.quantity, 'inStock:', inStock);
+    }
+  } else {
+    console.log('❌ No variants found for product');
+    inStock = product.inStock || false;
+  }
+
   const image = product.images && product.images.length > 0 
     ? 'http://localhost:5000/' + product.images[0]
     : null;
-  const variantsCount = product.productVariantIds && product.productVariantIds.length || 0;
+  const variantsCount = product.productVariantIds?.length || 0;
 
-  return {
+  const result = {
     id: product._id,
     title: product.title || 'بدون عنوان',
     image: image,
-    price: defaultVariant.finalPrice || defaultVariant.price || 0,
-    originalPrice: defaultVariant.price || 0,
-    discount: defaultVariant.discountPercent || 0,
+    price: defaultVariant?.finalPrice || defaultVariant?.price || 0,
+    originalPrice: defaultVariant?.price || 0,
+    discount: defaultVariant?.discountPercent || 0,
     rating: product.ratingAvg || 0,
-    inStock: product.inStock || (defaultVariant.quantity && defaultVariant.quantity > 0) || false,
+    inStock: inStock,
     isFavorite: product.isFavorite || false,
     variantCount: variantsCount,
     variants: product.productVariantIds || [],
@@ -36,7 +70,19 @@ const processProductToCard = (product) => {
     tags: product.tags || [],
     brandId: product.brandId,
     categoryIds: product.categoryIds || [],
+    defaultVariantId: defaultVariantId,
+    defaultVariant: defaultVariant,
+    productId: product._id,
   };
+  
+  console.log('✅ Processed product result:', {
+    id: result.id,
+    title: result.title,
+    defaultVariantId: result.defaultVariantId,
+    variantCount: result.variantCount,
+  });
+  
+  return result;
 };
 
 export default function Products() {
@@ -49,6 +95,12 @@ export default function Products() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -66,11 +118,19 @@ export default function Products() {
 
         const data = await res.json();
 
+        console.log('📦 Full API response:', data);
+
         if (data && data.data) {
+          console.log('📦 First product from API:', data.data[0]);
+          console.log('📦 First product variants:', data.data[0]?.productVariantIds);
+          
           const processedProducts = data.data
-            .map(function(product) { return processProductToCard(product); })
+            .map(function(product) { 
+              return processProductToCard(product);
+            })
             .filter(function(item) { return item !== null; });
 
+          console.log('✅ Processed products:', processedProducts);
           setProducts(processedProducts);
           setTotalCount(data.count || 0);
           setTotalPages(Math.ceil((data.count || 0) / 8));
@@ -125,8 +185,127 @@ export default function Products() {
     }
   };
 
-  const handleAddToCart = function(productId) {
-    console.log('🛒 Add to cart:', productId);
+  const handleAddToCart = async (productId) => {
+    try {
+      console.log('🛒 Starting add to cart for productId:', productId);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setSnackbar({
+          open: true,
+          message: 'لطفاً ابتدا وارد حساب خود شوید',
+          severity: 'warning',
+        });
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+        return;
+      }
+
+      const product = products.find(p => p.id === productId);
+      console.log('📦 Found product in state:', product);
+
+      if (!product) {
+        setSnackbar({
+          open: true,
+          message: 'محصول یافت نشد',
+          severity: 'error',
+        });
+        return;
+      }
+
+      console.log('📋 Product details:', {
+        id: product.id,
+        title: product.title,
+        defaultVariantId: product.defaultVariantId,
+        variants: product.variants,
+        inStock: product.inStock
+      });
+
+      if (!product.inStock) {
+        setSnackbar({
+          open: true,
+          message: 'متأسفیم، این محصول موجود نیست',
+          severity: 'error',
+        });
+        return;
+      }
+
+      let productVariantId = product.defaultVariantId;
+      
+      // اگر defaultVariantId نداشت، از اولین واریانت استفاده کن
+      if (!productVariantId && product.variants && product.variants.length > 0) {
+        const firstVariant = product.variants[0];
+        productVariantId = firstVariant._id || firstVariant.id;
+        console.log('🔄 Using first variant _id:', productVariantId);
+        console.log('🔄 First variant full object:', firstVariant);
+      }
+      
+      console.log('🎯 Final productVariantId to send:', productVariantId);
+
+      if (!productVariantId) {
+        setSnackbar({
+          open: true,
+          message: 'تنوع محصول یافت نشد',
+          severity: 'error',
+        });
+        console.error('❌ No productVariantId found for product:', product);
+        return;
+      }
+
+      const cartData = {
+        productVariantId: productVariantId,
+      };
+
+      console.log('📤 Sending to cart - full data:', JSON.stringify(cartData, null, 2));
+
+      const response = await fetch('http://localhost:5000/api/carts/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token,
+        },
+        body: JSON.stringify(cartData),
+      });
+
+      console.log('📥 Response status:', response.status);
+      
+      const responseText = await response.text();
+      console.log('📥 Raw response:', responseText);
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error('❌ Invalid JSON:', responseText);
+        throw new Error('پاسخ سرور معتبر نیست');
+      }
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'خطا در افزودن به سبد خرید');
+      }
+
+      setSnackbar({
+        open: true,
+        message: result.message || 'محصول با موفقیت به سبد خرید اضافه شد ✅',
+        severity: 'success',
+      });
+
+    } catch (err) {
+      console.error('❌ Error adding to cart:', err);
+      setSnackbar({
+        open: true,
+        message: err.message || 'خطا در افزودن به سبد خرید',
+        severity: 'error',
+      });
+    }
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar(prev => ({ ...prev, open: false }));
   };
 
   if (loading) {
@@ -268,6 +447,26 @@ export default function Products() {
           />
         </Box>
       )}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{
+            borderRadius: 3,
+            width: '100%',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+          }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

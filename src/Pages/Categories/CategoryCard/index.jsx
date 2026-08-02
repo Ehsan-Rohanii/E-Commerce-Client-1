@@ -19,16 +19,22 @@ import {
 } from '@mui/icons-material'
 import { styled } from '@mui/material/styles'
 
+// =============================================
+// استایل‌های ثابت و یکسان برای همه کارت‌ها
+// =============================================
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: 16,
   overflow: 'hidden',
   backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  height: '100%',
+  height: '100%', // مهم: پر کردن کامل ارتفاع
+  minHeight: 340, // ارتفاع ثابت برای همه
+  maxHeight: 340, // حداکثر ارتفاع ثابت
   display: 'flex',
   flexDirection: 'column',
   direction: 'rtl',
+  width: '100%', // عرض کامل
   '&:hover': {
     transform: 'translateY(-6px)',
     boxShadow: theme.palette.mode === 'dark'
@@ -38,27 +44,27 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }))
 
+// ===== تصویر با نسبت ثابت 4:3 =====
 const ImageWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
-  paddingTop: '75%',
+  width: '100%',
+  paddingTop: '75%', // نسبت 4:3 ثابت برای همه
   backgroundColor: theme.palette.mode === 'dark' ? '#0a0a0a' : '#f5f5f5',
   overflow: 'hidden',
-  flexShrink: 0,
+  flexShrink: 0, // جلوگیری از کوچک شدن
 }))
 
-const StyledMedia = styled(CardMedia)({
+const StyledMedia = styled('img')({
   position: 'absolute',
   top: 0,
   left: 0,
   width: '100%',
   height: '100%',
-  objectFit: 'cover',
+  objectFit: 'cover', // برش تصویر برای پر کردن کامل
   transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-  '&:hover': {
-    transform: 'scale(1.05)',
-  },
 })
 
+// ===== محتوای پایین با ارتفاع ثابت =====
 const StyledCardContent = styled(CardContent)({
   flex: 1,
   display: 'flex',
@@ -66,9 +72,12 @@ const StyledCardContent = styled(CardContent)({
   justifyContent: 'space-between',
   padding: '16px',
   paddingBottom: '16px !important',
-  minHeight: 90,
+  minHeight: 100, // ارتفاع ثابت برای بخش متن
+  height: 100, // ارتفاع دقیق
+  maxHeight: 100,
 })
 
+// ===== عنوان با ارتفاع ثابت (حداکثر 2 خط) =====
 const TitleTypography = styled(Typography)({
   fontWeight: 600,
   overflow: 'hidden',
@@ -77,33 +86,53 @@ const TitleTypography = styled(Typography)({
   WebkitLineClamp: 2,
   WebkitBoxOrient: 'vertical',
   lineHeight: 1.3,
-  height: '2.6em',
-  marginBottom: 6,
+  height: '2.6em', // 2 خط * 1.3
+  minHeight: '2.6em',
+  maxHeight: '2.6em',
   fontSize: '0.95rem',
   textAlign: 'right',
+  marginBottom: 'auto',
 })
 
+// ===== چیپ‌ها با ارتفاع ثابت =====
 const ChipsContainer = styled(Stack)({
   flexWrap: 'wrap',
   gap: 4,
   marginTop: 'auto',
-  minHeight: 24,
+  minHeight: 30,
+  height: 30,
+  maxHeight: 30,
   justifyContent: 'flex-start',
+  alignItems: 'center',
 })
 
+const StyledChip = styled(Chip)({
+  borderRadius: 4,
+  height: 26,
+  '& .MuiChip-label': {
+    fontSize: '0.65rem',
+    padding: '0 8px',
+  },
+})
+
+// =============================================
+// حالت لیست
+// =============================================
 const ListCard = styled(Paper)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   gap: 16,
-  padding: 12,
+  padding: '12px 16px',
   borderRadius: 16,
   backgroundColor: theme.palette.mode === 'dark' ? '#1a1a1a' : '#ffffff',
   border: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   cursor: 'pointer',
   height: '100%',
-  minHeight: 90,
+  minHeight: 100,
+  maxHeight: 100,
   direction: 'rtl',
+  width: '100%',
   '&:hover': {
     transform: 'translateX(8px)',
     borderColor: '#FF8C00',
@@ -116,6 +145,10 @@ const ListCard = styled(Paper)(({ theme }) => ({
 const ListImage = styled(Box)(({ theme }) => ({
   width: 70,
   height: 70,
+  minWidth: 70,
+  maxWidth: 70,
+  minHeight: 70,
+  maxHeight: 70,
   borderRadius: 12,
   overflow: 'hidden',
   flexShrink: 0,
@@ -134,6 +167,7 @@ const ListContent = styled(Box)({
   flexDirection: 'column',
   justifyContent: 'center',
   gap: 4,
+  height: '100%',
 })
 
 const ListTitle = styled(Typography)({
@@ -143,15 +177,16 @@ const ListTitle = styled(Typography)({
   whiteSpace: 'nowrap',
   fontSize: '0.95rem',
   textAlign: 'right',
+  height: '1.5em',
+  minHeight: '1.5em',
 })
 
-const StyledChip = styled(Chip)({
-  borderRadius: 1,
-  height: 22,
-  '& .MuiChip-label': {
-    fontSize: '0.65rem',
-    padding: '0 6px',
-  },
+const ListChipsContainer = styled(Stack)({
+  flexWrap: 'wrap',
+  gap: 4,
+  minHeight: 26,
+  height: 26,
+  maxHeight: 26,
 })
 
 export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
@@ -168,18 +203,42 @@ export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
 
   const subCategoriesCount = Array.isArray(subCategoryIds) ? subCategoryIds.length : 0
 
+  // =============================================
   // حالت لیست
+  // =============================================
   if (viewMode === 'list') {
     return (
       <ListCard onClick={onClick} elevation={0}>
-        <ChevronLeft sx={{ color: '#FF8C00', opacity: 0.6, flexShrink: 0 }} />
+        <ChevronLeft sx={{ 
+          color: '#FF8C00', 
+          opacity: 0.6, 
+          flexShrink: 0,
+          fontSize: 24,
+        }} />
         
+        <ListImage>
+          {image ? (
+            <img src={image} alt={title} loading="lazy" />
+          ) : (
+            <Box sx={{ 
+              width: '100%', 
+              height: '100%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              bgcolor: isDark ? 'rgba(255,140,0,0.1)' : 'rgba(255,140,0,0.05)',
+            }}>
+              <CategoryIcon sx={{ fontSize: 32, color: '#FF8C00', opacity: 0.5 }} />
+            </Box>
+          )}
+        </ListImage>
+
         <ListContent>
           <ListTitle variant="h6">
             {title}
           </ListTitle>
           
-          <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
+          <ListChipsContainer direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <StyledChip
               label={`${subCategoriesCount} زیردسته`}
               icon={<Inventory sx={{ fontSize: 14 }} />}
@@ -197,30 +256,15 @@ export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
                 }}
               />
             )}
-          </Stack>
+          </ListChipsContainer>
         </ListContent>
-
-        <ListImage>
-          {image ? (
-            <img src={image} alt={title} loading="lazy" />
-          ) : (
-            <Box sx={{ 
-              width: '100%', 
-              height: '100%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              bgcolor: isDark ? 'rgba(255,140,0,0.1)' : 'rgba(255,140,0,0.05)',
-            }}>
-              <CategoryIcon sx={{ fontSize: 28, color: '#FF8C00', opacity: 0.5 }} />
-            </Box>
-          )}
-        </ListImage>
       </ListCard>
     )
   }
 
+  // =============================================
   // حالت گرید
+  // =============================================
   return (
     <StyledCard>
       <CardActionArea 
@@ -230,13 +274,13 @@ export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
           display: 'flex', 
           flexDirection: 'column', 
           alignItems: 'stretch',
+          width: '100%',
         }}
       >
         <ImageWrapper>
           {image ? (
             <StyledMedia
-              component="img"
-              image={image}
+              src={image}
               alt={title}
               loading="lazy"
             />
@@ -267,7 +311,7 @@ export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
                 borderRadius: 1,
                 backdropFilter: 'blur(10px)',
                 bgcolor: 'rgba(244, 67, 54, 0.9)',
-                height: 22,
+                height: 24,
                 '& .MuiChip-label': { fontSize: '0.65rem' },
               }}
             />
@@ -279,7 +323,7 @@ export default function CategoryCard({ category, onClick, viewMode = 'grid' }) {
             {title}
           </TitleTypography>
           
-          <ChipsContainer direction="row" spacing={1}>
+          <ChipsContainer direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <StyledChip
               label={`${subCategoriesCount} زیردسته`}
               icon={<Inventory sx={{ fontSize: 14 }} />}

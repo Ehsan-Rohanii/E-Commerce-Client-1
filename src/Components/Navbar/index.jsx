@@ -212,7 +212,6 @@ export default function Navbar({ onMenuClick }) {
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const colorMode = useContext(ColorModeContext);
 
@@ -226,31 +225,18 @@ export default function Navbar({ onMenuClick }) {
 
   const cartCount = 3;
 
-  // ✅ یک useEffect برای گرفتن user از localStorage
   useEffect(() => {
     const loadUserData = () => {
       const userData = localStorage.getItem("user");
-      console.log("📦 Raw user data from storage:", userData);
-      
       if (userData) {
         try {
           const parsedUser = JSON.parse(userData);
-          console.log("👤 Parsed user:", parsedUser);
-          
           setUser(parsedUser);
           setLoggedIn(true);
           setAdmin(parsedUser.role === "admin");
         } catch (error) {
-          console.error("❌ Error parsing user:", error);
-          setLoggedIn(false);
-          setUser(null);
-          setAdmin(false);
+          console.error("Error parsing user:", error);
         }
-      } else {
-        console.log("ℹ️ No user data found in localStorage");
-        setLoggedIn(false);
-        setUser(null);
-        setAdmin(false);
       }
     };
 
@@ -260,11 +246,9 @@ export default function Navbar({ onMenuClick }) {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
-    
-    // ✅ گوش دادن به تغییرات localStorage
+
     const handleStorageChange = (e) => {
       if (e.key === "user") {
-        console.log("🔄 User data changed in localStorage");
         loadUserData();
       }
     };
@@ -315,12 +299,26 @@ export default function Navbar({ onMenuClick }) {
     return location.pathname === path;
   };
 
+  const isDark = theme.palette.mode === "dark";
+
+  // 🔍 SEARCH: تابع جستجو
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/search?q=${searchQuery}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
+  };
+
+  const getUserInitial = () => {
+    if (!user) return "U";
+    const name = user.fullName || user.fullname || user.name || user.username || "";
+    return name.charAt(0)?.toUpperCase() || "U";
+  };
+
+  const getFullName = () => {
+    if (!user) return "کاربر";
+    return user.fullName || user.fullname || user.name || user.username || "کاربر";
   };
 
   const menuItems = [
@@ -330,21 +328,6 @@ export default function Navbar({ onMenuClick }) {
     { text: "برند ها", icon: <BrandingWatermark />, path: "/brands" },
     { text: "فروش ویژه", icon: <Discount />, path: "/sales" },
   ];
-
-  const isDark = theme.palette.mode === "dark";
-
-  // ✅ دریافت حرف اول نام کاربر با مدیریت خطا
-  const getUserInitial = () => {
-    if (!user) return "U";
-    const name = user.fullName || "";
-    return name.charAt(0)?.toUpperCase() || "U";
-  };
-
-  // ✅ دریافت نام کامل کاربر با مدیریت خطا
-  const getFullName = () => {
-    if (!user) return "کاربر";
-    return user.fullname || user.fullName || user.name || user.username || "کاربر";
-  };
 
   return (
     <StyledAppBar position="sticky" scrolled={scrolled}>
@@ -419,6 +402,7 @@ export default function Navbar({ onMenuClick }) {
                 </NavButton>
               ))}
 
+              {/* 🔍 SEARCH: بخش جستجو - فقط دسکتاپ */}
               <Box
                 component="form"
                 onSubmit={handleSearch}
@@ -503,6 +487,7 @@ export default function Navbar({ onMenuClick }) {
               flexShrink: 0,
             }}
           >
+            {/* 🔍 SEARCH: آیکون جستجو برای موبایل */}
             {isMobile && (
               <ActionIconButton
                 onClick={() => navigate("/search")}
