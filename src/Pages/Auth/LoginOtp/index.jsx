@@ -80,7 +80,7 @@ export default function LoginOtp() {
     }    
 
     // ✅ هدایت به صفحه اصلی
-    navigate('/');
+    // navigate('/');
   } catch (err) {
     setError(err.message);
   } finally {
