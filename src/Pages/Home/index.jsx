@@ -19,7 +19,7 @@ export default function Home() {
       }}
     >
       <Slider />
-      {/* <Products /> */}
+      <Products />
     </Box>
   );
 }
