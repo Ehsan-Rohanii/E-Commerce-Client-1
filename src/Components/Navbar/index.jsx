@@ -391,7 +391,7 @@ export default function Navbar({ onMenuClick }) {
                 <NavButton
                   key={item.text}
                   onClick={() => handleNavigate(item.path)}
-                  startIcon={item.icon}
+                  // startIcon={item.icon}
                   active={isActivePath(item.path) ? 1 : 0}
                   sx={{
                     px: { md: 1.5, lg: 2 },
@@ -462,7 +462,7 @@ export default function Navbar({ onMenuClick }) {
                 />
               </Box>
 
-              {admin && (
+              {/* {admin && (
                 <AdminButton
                   onClick={() => handleNavigate("/admin")}
                   startIcon={<AdminPanelSettings />}
@@ -474,7 +474,7 @@ export default function Navbar({ onMenuClick }) {
                 >
                   مدیریت
                 </AdminButton>
-              )}
+              )} */}
             </Box>
           )}
 
