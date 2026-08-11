@@ -323,7 +323,7 @@ export default function Navbar({ onMenuClick }) {
 
   const menuItems = [
     { text: "خانه", icon: <Home />, path: "/" },
-    { text: "محصولات", icon: <Category />, path: "/products" },
+    // { text: "محصولات", icon: <Category />, path: "/products" },
     { text: "دسته‌بندی‌ها", icon: <Category />, path: "/categories" },
     { text: "برند ها", icon: <BrandingWatermark />, path: "/brands" },
     { text: "فروش ویژه", icon: <Discount />, path: "/sales" },
@@ -395,7 +395,7 @@ export default function Navbar({ onMenuClick }) {
                   active={isActivePath(item.path) ? 1 : 0}
                   sx={{
                     px: { md: 1.5, lg: 2 },
-                    fontSize: { md: "0.85rem", lg: "0.95rem" },
+                    fontSize: { md: "0.65rem", lg: "0.75rem" },
                   }}
                 >
                   {item.text}
@@ -514,7 +514,7 @@ export default function Navbar({ onMenuClick }) {
                   },
                 }}
               >
-                <Favorite sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+                <Favorite sx={{ fontSize: { xs: 16, sm: 18, md: 20 } }} />
               </Badge>
             </ActionIconButton>
 
@@ -532,7 +532,7 @@ export default function Navbar({ onMenuClick }) {
                   },
                 }}
               >
-                <Notifications sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+                <Notifications sx={{ fontSize: { xs: 16, sm: 18, md: 20 }}} />
               </Badge>
             </ActionIconButton>
 
@@ -550,7 +550,7 @@ export default function Navbar({ onMenuClick }) {
                   },
                 }}
               >
-                <ShoppingCart sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+                <ShoppingCart sx={{ fontSize: { xs: 16, sm: 18, md: 20 }}} />
               </Badge>
             </ActionIconButton>
 
@@ -560,15 +560,15 @@ export default function Navbar({ onMenuClick }) {
               sx={{ display: { xs: "none", sm: "flex" } }}
             >
               {isDark ? (
-                <LightMode sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+                <LightMode sx={{ fontSize: { xs: 16, sm: 18, md: 20 } }} />
               ) : (
-                <DarkMode sx={{ fontSize: { xs: 20, sm: 22, md: 24 } }} />
+                <DarkMode sx={{ fontSize: { xs: 16, sm: 18, md: 20 } }} />
               )}
             </ActionIconButton>
 
             {loggedIn ? (
               <>
-                <Tooltip title="حساب کاربری" arrow>
+                {/* <Tooltip title="حساب کاربری" arrow>
                   <StyledAvatar
                     onClick={handleOpenUserMenu}
                     sx={{
@@ -578,8 +578,8 @@ export default function Navbar({ onMenuClick }) {
                   >
                     {getUserInitial()}
                   </StyledAvatar>
-                </Tooltip>
-                <Menu
+                </Tooltip> */}
+                {/* <Menu
                   anchorEl={anchorElUser}
                   open={Boolean(anchorElUser)}
                   onClose={handleCloseUserMenu}
@@ -690,7 +690,7 @@ export default function Navbar({ onMenuClick }) {
                     </ListItemIcon>
                     خروج
                   </StyledMenuItem>
-                </Menu>
+                </Menu> */}
               </>
             ) : (
               <Stack direction="row" spacing={0.5} sx={{ mr: 0.5 }}>
