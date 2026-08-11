@@ -328,18 +328,18 @@ export default function SideBar({ open, onClose }) {
       path: "/brands",
       badge: "3",
     },
-    {
-      text: "کاربران",
-      icon: <People />,
-      path: "/Users",
-      badge: "3",
-    },
-    {
-      text: "اسلاید ها",
-      icon: <Slideshow />,
-      path: "/slides",
-      badge: "3",
-    },
+    // {
+    //   text: "کاربران",
+    //   icon: <People />,
+    //   path: "/Users",
+    //   badge: "3",
+    // },
+    // {
+    //   text: "اسلاید ها",
+    //   icon: <Slideshow />,
+    //   path: "/slides",
+    //   badge: "3",
+    // },
     {
       text: "کد تخفیف ها",
       icon: <Discount />,
@@ -362,12 +362,12 @@ export default function SideBar({ open, onClose }) {
   ];
 
   const adminMenuItems = [
-    { text: "داشبورد", icon: <Dashboard />, path: "/admin" },
-    { text: "مدیریت محصولات", icon: <Inventory />, path: "/admin/products" },
-    { text: "مدیریت سفارشات", icon: <LocalShipping />, path: "/admin/orders" },
-    { text: "مدیریت کاربران", icon: <Person />, path: "/admin/users" },
-    { text: "مدیریت تخفیف‌ها", icon: <Discount />, path: "/admin/discounts" },
-    { text: "گزارشات", icon: <Payment />, path: "/admin/reports" },
+    // { text: "داشبورد", icon: <Dashboard />, path: "/admin" },
+    // { text: "مدیریت محصولات", icon: <Inventory />, path: "/admin/products" },
+    // { text: "مدیریت سفارشات", icon: <LocalShipping />, path: "/admin/orders" },
+    // { text: "مدیریت کاربران", icon: <Person />, path: "/admin/users" },
+    // { text: "مدیریت تخفیف‌ها", icon: <Discount />, path: "/admin/discounts" },
+    // { text: "گزارشات", icon: <Payment />, path: "/admin/reports" },
   ];
 
   const drawerContent = (
@@ -867,7 +867,7 @@ export default function SideBar({ open, onClose }) {
                   : "rgba(0,0,0,0.05)",
               }}
             />
-            <List sx={{ width: "100%", px: 0.5 }}>
+            {/* <List sx={{ width: "100%", px: 0.5 }}>
               <Typography
                 variant="caption"
                 sx={{
@@ -905,7 +905,7 @@ export default function SideBar({ open, onClose }) {
                   </StyledListItemButton>
                 </StyledListItem>
               ))}
-            </List>
+            </List> */}
           </>
         )}
 
