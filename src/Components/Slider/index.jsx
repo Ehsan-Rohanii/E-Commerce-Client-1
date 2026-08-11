@@ -118,6 +118,26 @@ const Dot = styled(Box)(({ active }) => ({
   },
 }));
 
+// داده‌های استاتیک برای مواقعی که سرور در دسترس نیست
+const STATIC_SLIDES = [
+  {
+    _id: '1',
+    title: 'به فروشگاه ما خوش آمدید',
+    description: 'بهترین محصولات با بهترین قیمت‌ها',
+    image: '/Slider1.jpg',
+    path: '/products',
+    isPublished: true,
+  },
+  {
+    _id: '2',
+    title: 'تخفیف‌های ویژه',
+    description: 'تا ۵۰٪ تخفیف برای خرید اول',
+    image: '/Slider1.jpg',
+    path: '/products',
+    isPublished: true,
+  },
+];
+
 export default function Slider() {
   const navigate = useNavigate();
   const [slides, setSlides] = useState([]);
@@ -126,6 +146,24 @@ export default function Slider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const timerRef = useRef(null);
+
+  // تابع برای ساخت آدرس کامل عکس
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    
+    // اگر آدرس با http یا https شروع شود، همان آدرس است
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    
+    // اگر آدرس با / شروع شود، از ریشه پروژه استفاده کن
+    if (imagePath.startsWith('/')) {
+      return imagePath;
+    }
+    
+    // در غیر این صورت، یک / به اول آن اضافه کن
+    return `/${imagePath}`;
+  };
 
   useEffect(() => {
     const fetchSlides = async () => {
@@ -138,17 +176,22 @@ export default function Slider() {
         }
         
         const data = await response.json();
+        console.log('Received data from server:', data); // برای دیباگ
         
-        if (data.success && data.data) {
+        if (data.success && data.data && data.data.length > 0) {
           const publishedSlides = data.data.filter(slide => slide.isPublished === true);
-          setSlides(publishedSlides);
+          if (publishedSlides.length > 0) {
+            setSlides(publishedSlides);
+          } else {
+            setSlides(STATIC_SLIDES);
+          }
         } else {
-          setSlides([]);
+          setSlides(STATIC_SLIDES);
         }
       } catch (err) {
         console.error('Error fetching slides:', err);
         setError(err.message || 'خطا در دریافت اسلایدها');
-        setSlides([]);
+        setSlides(STATIC_SLIDES);
       } finally {
         setLoading(false);
       }
@@ -204,7 +247,7 @@ export default function Slider() {
     );
   }
 
-  if (error) {
+  if (error && slides.length === 0) {
     return (
       <Box sx={{ 
         p: 4, 
@@ -239,11 +282,14 @@ export default function Slider() {
   }
 
   const currentSlideData = slides[currentSlide];
+  const imageUrl = getImageUrl(currentSlideData.image);
+  
+  console.log('Current slide image URL:', imageUrl); // برای دیباگ
 
   return (
     <StyledSliderContainer>
       <SlideWrapper>
-        <SlideImage image={currentSlideData.image} />
+        <SlideImage image={imageUrl} />
         
         <SlideContent>
           {currentSlideData.title && (
@@ -280,7 +326,15 @@ export default function Slider() {
           <Stack direction="row" spacing={2} sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }}>
             <Button
               variant="contained"
-              onClick={() => navigate(currentSlideData.path || '/')}
+              onClick={() => {
+                if (currentSlideData.href) {
+                  window.open(currentSlideData.href, '_blank');
+                } else if (currentSlideData.path) {
+                  navigate(currentSlideData.path);
+                } else {
+                  navigate('/');
+                }
+              }}
               sx={{
                 borderRadius: 3,
                 px: 4,
