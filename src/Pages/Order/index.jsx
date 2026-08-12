@@ -217,7 +217,7 @@ export default function Order() {
 
   const getStatusLabel = (status) => {
     const labels = {
-      pending: 'در انتظار پرداخت',
+      pending: 'در انتظار پرداخت است',
       success: 'پرداخت موفق',
       failed: 'پرداخت ناموفق',
       stockIssue: 'مشکل موجودی',
@@ -228,7 +228,7 @@ export default function Order() {
   const getDeliveryLabel = (status) => {
     const labels = {
       processing: 'در حال پردازش',
-      pending: 'در انتظار ارسال',
+      pending: 'در انتظار ارسال است',
       shipped: 'ارسال شده',
       delivered: 'تحویل داده شده',
       cancel: 'لغو شده',
@@ -288,7 +288,7 @@ export default function Order() {
         {/* هدر */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
           <Typography variant="h4" fontWeight={800} sx={{ color: '#FF8C00' }}>
-            سفارشات من
+            سفارش های من
           </Typography>
           <Button
             variant="outlined"
