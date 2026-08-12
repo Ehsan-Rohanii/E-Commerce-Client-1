@@ -40,7 +40,7 @@ export default function Login() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'خطا در ارسال کد');
+        throw new Error(result.message || 'خطا در ارسال کد ,  لطفا دقت کنید');
       }
 
       // هدایت به صفحه تأیید کد
