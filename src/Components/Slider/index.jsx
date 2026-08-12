@@ -189,7 +189,7 @@ export default function Slider() {
           setSlides(STATIC_SLIDES);
         }
       } catch (err) {
-        console.error('Error fetching slides:', err);
+        console.error('Error fetching slides , ارور داریم:', err);
         setError(err.message || 'خطا در دریافت اسلایدها');
         setSlides(STATIC_SLIDES);
       } finally {
