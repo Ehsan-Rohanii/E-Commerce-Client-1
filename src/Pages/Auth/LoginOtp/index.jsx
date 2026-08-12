@@ -66,7 +66,7 @@ export default function LoginOtp() {
     console.log('Response:', result); // برای دیباگ
 
     if (!response.ok) {
-      throw new Error(result.message || 'کد تأیید نامعتبر است');
+      throw new Error(result.message || 'کد تأیید نامعتبر است , لطفا دقت کنید');
     }
 
     // ✅ ذخیره توکن در localStorage
