@@ -722,7 +722,7 @@ export default function Profile() {
                   <InfoLabel>
                     <Badge sx={{ color: '#FF8C00', fontSize: 20 }} />
                     <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      نام کامل:
+                      نام کامل :
                     </Typography>
                   </InfoLabel>
                   <InfoValue>
@@ -734,7 +734,7 @@ export default function Profile() {
                   <InfoLabel>
                     <Phone sx={{ color: '#FF8C00', fontSize: 20 }} />
                     <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      شماره موبایل:
+                      شماره موبایل :
                     </Typography>
                   </InfoLabel>
                   <InfoValue>
@@ -746,7 +746,7 @@ export default function Profile() {
                   <InfoLabel>
                     <Cake sx={{ color: '#FF8C00', fontSize: 20 }} />
                     <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      تاریخ تولد:
+                      تاریخ تولد :
                     </Typography>
                   </InfoLabel>
                   <InfoValue>
@@ -758,7 +758,7 @@ export default function Profile() {
                   <InfoLabel>
                     <Badge sx={{ color: '#FF8C00', fontSize: 20 }} />
                     <Typography variant="body2" color="text.secondary" fontWeight={600}>
-                      نقش کاربری:
+                      نقش کاربری :
                     </Typography>
                   </InfoLabel>
                   <InfoValue>
