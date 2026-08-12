@@ -287,12 +287,12 @@ export default function Products() {
 
       setSnackbar({
         open: true,
-        message: result.message || 'محصول با موفقیت به سبد خرید اضافه شد ✅',
+        message: result.message || 'محصول با موفقیت به سبد خرید اضافه شد',
         severity: 'success',
       });
 
     } catch (err) {
-      console.error('❌ Error adding to cart:', err);
+      console.error('❌ Error adding to Cart:', err);
       setSnackbar({
         open: true,
         message: err.message || 'خطا در افزودن به سبد خرید',
