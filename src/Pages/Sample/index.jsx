@@ -19,13 +19,13 @@ export default function BrandsSimple() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        تست ساده برندها
+        تست کردن ساده برندها
       </Typography>
       
       <Paper sx={{ p: 2 }}>
         <TextField
           fullWidth
-          placeholder="جستجو..."
+          placeholder="جستجو....."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           InputProps={{
@@ -41,7 +41,7 @@ export default function BrandsSimple() {
       </Paper>
       
       <Box sx={{ mt: 3 }}>
-        <Typography>عبارت جستجو: {searchTerm}</Typography>
+        <Typography>عبارت جستجو:   {searchTerm}</Typography>
       </Box>
     </Container>
   )
