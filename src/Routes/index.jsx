@@ -12,6 +12,8 @@ import Profile from "../Pages/Profile";
 import Order from "../Pages/Order";
 import Products from "../Pages/Products";
 import NotFound from "../Pages/NotFound";
+import ProductDetail from "../Pages/Products/ProductDetails";
+import Cart from "../Pages/Cart";
 
 const router = createBrowserRouter([
   {
@@ -31,9 +33,17 @@ const router = createBrowserRouter([
     element: <LoginOtp />,
   },
   {
+    path: "/products/:id",
+    element: <ProductDetail />,
+  },
+  {
+    path:"/cart" ,
+    element:<Cart/>
+  },
+  {
     path: "/",
     element: <Layout />,
-    errorElement:<NotFound/>,
+    errorElement: <NotFound />,
     children: [
       {
         index: true,
