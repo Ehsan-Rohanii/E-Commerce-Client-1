@@ -1,5 +1,6 @@
 // src/Pages/Products/ProductCard/index.jsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardMedia,
@@ -12,7 +13,7 @@ import {
   Button,
   useTheme,
 } from '@mui/material';
-import { ShoppingCart, Favorite, FavoriteBorder } from '@mui/icons-material';
+import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -31,6 +32,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   flexShrink: 0,
+  cursor: 'pointer',
   '&:hover': {
     transform: 'translateY(-8px)',
     boxShadow: theme.palette.mode === 'dark'
@@ -169,6 +171,7 @@ function ProductCard({
 }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const navigate = useNavigate();
 
   let discountedPrice = 0;
   let hasValidPrice = false;
@@ -187,8 +190,30 @@ function ProductCard({
     imageUrl = image;
   }
 
+  // رفتن به صفحه محصول با استفاده از id
+  const handleCardClick = () => {
+    if (id) {
+      navigate(`/products/${id}`);
+    }
+  };
+
+  // جلوگیری از propagation برای دکمه‌ها
+  const handleAddToCartClick = (e) => {
+    e.stopPropagation();
+    if (onAddToCart) {
+      onAddToCart();
+    }
+  };
+
+  const handleFavoriteClick = (e) => {
+    e.stopPropagation();
+    if (onFavoriteToggle) {
+      onFavoriteToggle();
+    }
+  };
+
   return (
-    <StyledCard>
+    <StyledCard onClick={handleCardClick}>
       <Box sx={{ position: 'relative', flexShrink: 0, height: 240 }}>
         <StyledCardMedia component="img" image={imageUrl} alt={title || 'Product'} loading="lazy" />
 
@@ -236,7 +261,7 @@ function ProductCard({
 
         <Button
           size="small"
-          onClick={onFavoriteToggle}
+          onClick={handleFavoriteClick}
           sx={{
             position: 'absolute',
             top: 12,
@@ -341,9 +366,8 @@ function ProductCard({
       <StyledCardActions>
         <OrangeButton
           variant="contained"
-          onClick={onAddToCart}
+          onClick={handleAddToCartClick}
           disabled={!inStock}
-          endIcon={<ShoppingCart sx={{ fontSize: 16 }} />}
         >
           {inStock ? 'افزودن به سبد خرید' : 'ناموجود'}
         </OrangeButton>
