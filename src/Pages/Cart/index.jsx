@@ -357,16 +357,32 @@ const Cart = () => {
   if (loading) {
     return (
       <Container maxWidth="sm" sx={{ py: 3, direction: "rtl" }}>
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 2,
+          }}
+        >
           <Skeleton variant="text" width={140} height={32} />
           <Skeleton variant="circular" width={32} height={32} />
         </Box>
         <Stack spacing={2}>
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} variant="rounded" height={100} sx={{ borderRadius: 3 }} />
+            <Skeleton
+              key={i}
+              variant="rounded"
+              height={100}
+              sx={{ borderRadius: 3 }}
+            />
           ))}
         </Stack>
-        <Skeleton variant="rounded" height={220} sx={{ mt: 2, borderRadius: 3 }} />
+        <Skeleton
+          variant="rounded"
+          height={220}
+          sx={{ mt: 2, borderRadius: 3 }}
+        />
       </Container>
     );
   }
@@ -374,7 +390,10 @@ const Cart = () => {
   if (error && !cart) {
     return (
       <Container maxWidth="sm" sx={{ py: 6, textAlign: "center" }}>
-        <Alert severity="error" sx={{ borderRadius: 3, mb: 2, fontSize: "0.9rem" }}>
+        <Alert
+          severity="error"
+          sx={{ borderRadius: 3, mb: 2, fontSize: "0.9rem" }}
+        >
           {error}
         </Alert>
         <Button
@@ -395,7 +414,6 @@ const Cart = () => {
 
   return (
     <Container maxWidth="sm" sx={{ py: 3, direction: "rtl" }}>
-
       {/* Header - ArrowBack سمت راست */}
       <Box
         sx={{
@@ -409,22 +427,22 @@ const Cart = () => {
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography variant="h5" sx={{ fontWeight: 700, fontSize: "1.1rem" }}>
-             سبد خرید
+            سبد خرید
           </Typography>
           {!isEmpty && (
-  <Chip
-    label={`${cartItems.length} محصول`}
-    size="small"
-    sx={{
-      bgcolor: "#FF8C00",
-      color: "#fff",
-      fontWeight: 600,
-      borderRadius: 2,
-      fontSize: "0.6rem",
-      height: 22,
-    }}
-  />
-)}
+            <Chip
+              label={`${cartItems.length} محصول`}
+              size="small"
+              sx={{
+                bgcolor: "#FF8C00",
+                color: "#fff",
+                fontWeight: 600,
+                borderRadius: 2,
+                fontSize: "0.6rem",
+                height: 22,
+              }}
+            />
+          )}
         </Box>
         <IconButton
           onClick={() => navigate("/")}
@@ -444,10 +462,17 @@ const Cart = () => {
       {isEmpty ? (
         <EmptyCartBox>
           <Box sx={{ fontSize: 60, mb: 2 }}>🛒</Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, fontSize: "1.1rem" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 700, mb: 0.5, fontSize: "1.1rem" }}
+          >
             سبد خرید شما خالی است
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontSize: "0.8rem" }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 3, fontSize: "0.8rem" }}
+          >
             محصولات مورد نظر خود را به سبد خرید اضافه کنید
           </Typography>
           <Button
@@ -477,9 +502,9 @@ const Cart = () => {
               onClick={handleClearCart}
               startIcon={<Clear sx={{ fontSize: 16 }} />}
               disabled={updating}
-              sx={{ 
-                borderRadius: 2, 
-                px: 2, 
+              sx={{
+                borderRadius: 2,
+                px: 2,
                 py: 0.5,
                 fontSize: "0.7rem",
                 fontWeight: 600,
@@ -520,14 +545,14 @@ const Cart = () => {
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                           variant="subtitle2"
-                          sx={{ 
-                            fontWeight: 600, 
+                          sx={{
+                            fontWeight: 600,
                             fontSize: "0.8rem",
                             mb: 0.2,
                           }}
                         >
-                          {product.title?.length > 25 
-                            ? product.title.slice(0, 25) + "..." 
+                          {product.title?.length > 25
+                            ? product.title.slice(0, 25) + "..."
                             : product.title || "بدون عنوان"}
                         </Typography>
                         {variant.title && (
@@ -553,7 +578,10 @@ const Cart = () => {
                             flexWrap: "wrap",
                           }}
                         >
-                          <PriceTag variant="caption" sx={{ fontSize: "0.8rem" }}>
+                          <PriceTag
+                            variant="caption"
+                            sx={{ fontSize: "0.8rem" }}
+                          >
                             {item.price?.toLocaleString("fa-IR")} تومان
                           </PriceTag>
                           {item.originalPrice > item.price && (
@@ -607,10 +635,7 @@ const Cart = () => {
                           <QuantityButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(
-                                item._id,
-                                item.quantity - 1,
-                              )
+                              handleQuantityChange(item._id, item.quantity - 1)
                             }
                             disabled={item.quantity <= 1 || updating}
                           >
@@ -630,10 +655,7 @@ const Cart = () => {
                           <QuantityButton
                             size="small"
                             onClick={() =>
-                              handleQuantityChange(
-                                item._id,
-                                item.quantity + 1,
-                              )
+                              handleQuantityChange(item._id, item.quantity + 1)
                             }
                             disabled={updating}
                           >
@@ -671,34 +693,62 @@ const Cart = () => {
               }`,
             }}
           >
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1.5, fontSize: "0.9rem" }}>
-               خلاصه سبد خرید
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700, mb: 1.5, fontSize: "0.9rem" }}
+            >
+              خلاصه سبد خرید
             </Typography>
 
             <SummaryItem>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: "0.8rem" }}
+              >
                 تعداد محصولات
               </Typography>
-              <Typography variant="body2" fontWeight={600} sx={{ fontSize: "0.8rem" }}>
+              <Typography
+                variant="body2"
+                fontWeight={600}
+                sx={{ fontSize: "0.8rem" }}
+              >
                 {totalItems} عدد
               </Typography>
             </SummaryItem>
 
             <SummaryItem>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: "0.8rem" }}
+              >
                 قیمت کل
               </Typography>
-              <Typography variant="body2" fontWeight={600} sx={{ fontSize: "0.8rem" }}>
+              <Typography
+                variant="body2"
+                fontWeight={600}
+                sx={{ fontSize: "0.8rem" }}
+              >
                 {totalPrice.toLocaleString("fa-IR")} تومان
               </Typography>
             </SummaryItem>
 
             <SummaryItem sx={{ borderBottom: "none" }}>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: "0.8rem" }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: "0.8rem" }}
+              >
                 هزینه ارسال
               </Typography>
-              <Typography variant="body2" color="#4CAF50" fontWeight={700} sx={{ fontSize: "0.8rem" }}>
-                رایگان 
+              <Typography
+                variant="body2"
+                color="#4CAF50"
+                fontWeight={700}
+                sx={{ fontSize: "0.8rem" }}
+              >
+                رایگان
               </Typography>
             </SummaryItem>
 
@@ -707,7 +757,10 @@ const Cart = () => {
             <Box
               sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: "0.85rem" }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, fontSize: "0.85rem" }}
+              >
                 مبلغ قابل پرداخت
               </Typography>
               <Typography
@@ -732,7 +785,7 @@ const Cart = () => {
               onClick={handleCheckout}
               disabled={isEmpty || updating}
               endIcon={<Payment sx={{ fontSize: 18 }} />}
-              sx={{gap:1}}
+              sx={{ gap: 1 }}
             >
               ادامه فرآیند خرید
             </CheckoutButton>
