@@ -508,8 +508,9 @@ const ProductDetail = () => {
                 variant="contained"
                 onClick={handleAddToCart}
                 disabled={!productInStock}
-                startIcon={<ShoppingCart />}
+                endIcon={<ShoppingCart />}
                 fullWidth
+                sx={{gap:1}}
               >
                 {productInStock ? 'افزودن به سبد خرید' : 'ناموجود'}
               </ActionButton>
